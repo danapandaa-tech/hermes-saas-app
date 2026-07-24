@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { projects, subscriptions, usageEvents, workflows } from '@/lib/db/schema'
 
 export const FREE_LIMITS = {
-  messagesPerMonth: 100,
+  messages: 100,
   projects: 3,
   workflows: 5,
 } as const
