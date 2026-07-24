@@ -5,9 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: var(--font-space-grotesk), 'Space Grotesk Fallback';
+  --font-heading: var(--font-fraunces), 'Fraunces Fallback';
   --font-sans: var(--font-inter), 'Inter Fallback';
-  --font-mono: var(--font-inter), 'Inter Fallback';
+  --font-mono: var(--font-ibm-plex-mono), 'IBM Plex Mono Fallback';
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -51,43 +51,63 @@
 :root,
 .dark {
   color-scheme: dark;
-  /* deep indigo / navy base */
-  --background: oklch(0.18 0.045 274);
-  --foreground: oklch(0.94 0.012 270);
-  /* navy cards, slightly lifted from bg */
-  --card: oklch(0.22 0.05 273);
-  --card-foreground: oklch(0.94 0.012 270);
-  --popover: oklch(0.23 0.052 273);
-  --popover-foreground: oklch(0.94 0.012 270);
-  /* electric blue accent as primary */
-  --primary: oklch(0.66 0.17 256);
-  --primary-foreground: oklch(0.16 0.04 274);
-  /* muted violet */
-  --secondary: oklch(0.3 0.07 290);
-  --secondary-foreground: oklch(0.94 0.012 270);
-  --muted: oklch(0.27 0.045 274);
-  --muted-foreground: oklch(0.68 0.03 272);
-  --accent: oklch(0.66 0.17 256);
-  --accent-foreground: oklch(0.16 0.04 274);
-  --destructive: oklch(0.62 0.21 22);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.66 0.17 256);
-  --chart-1: oklch(0.66 0.17 256);
-  --chart-2: oklch(0.62 0.16 290);
-  --chart-3: oklch(0.7 0.13 220);
-  --chart-4: oklch(0.55 0.15 300);
-  --chart-5: oklch(0.75 0.12 200);
-  --radius: 0.75rem;
-  /* sidebar a touch darker than bg for depth */
-  --sidebar: oklch(0.16 0.04 276);
-  --sidebar-foreground: oklch(0.9 0.015 270);
-  --sidebar-primary: oklch(0.66 0.17 256);
-  --sidebar-primary-foreground: oklch(0.16 0.04 274);
-  --sidebar-accent: oklch(0.26 0.055 280);
-  --sidebar-accent-foreground: oklch(0.94 0.012 270);
-  --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.66 0.17 256);
+
+  /* Hermes Dusk/Twilight Token System */
+  /* Base: Dusk indigo, not void-black */
+  --background: #1b1b3a;
+  --foreground: #edeae3;
+
+  /* Panel: Muted violet-slate */
+  --card: #2e2b52;
+  --card-foreground: #edeae3;
+  --popover: #2e2b52;
+  --popover-foreground: #edeae3;
+
+  /* Primary: Not used (Accent = Aged gold instead) */
+  --primary: #c9a574;
+  --primary-foreground: #1b1b3a;
+
+  /* Secondary: Calm sage (muted green) */
+  --secondary: #7c9885;
+  --secondary-foreground: #edeae3;
+
+  /* Muted text: Dusty lavender-gray */
+  --muted: #3d3a4f;
+  --muted-foreground: #8b87a6;
+
+  /* Accent: Aged gold/brass (sparingly) */
+  --accent: #c9a574;
+  --accent-foreground: #1b1b3a;
+
+  /* Destructive warning */
+  --destructive: #e74c3c;
+
+  /* Borders: Subtle, transparent white */
+  --border: rgb(255 255 255 / 0.08);
+  --input: rgb(255 255 255 / 0.1);
+
+  /* Ring/focus: Aged gold */
+  --ring: #c9a574;
+
+  /* Charts: Muted palette */
+  --chart-1: #c9a574;
+  --chart-2: #7c9885;
+  --chart-3: #3d3a4f;
+  --chart-4: #8b87a6;
+  --chart-5: #2e2b52;
+
+  /* Border radius */
+  --radius: 0.875rem;
+
+  /* Sidebar: Slightly darker than background for depth */
+  --sidebar: #161630;
+  --sidebar-foreground: #edeae3;
+  --sidebar-primary: #c9a574;
+  --sidebar-primary-foreground: #1b1b3a;
+  --sidebar-accent: #3d3a4f;
+  --sidebar-accent-foreground: #edeae3;
+  --sidebar-border: rgb(255 255 255 / 0.06);
+  --sidebar-ring: #c9a574;
 }
 
 @layer base {
@@ -109,19 +129,7 @@
 /* atmospheric, constellation-like glow behind the workspace */
 @utility hermes-aurora {
   background-image:
-    radial-gradient(
-      60% 50% at 15% 0%,
-      oklch(0.66 0.17 256 / 0.16),
-      transparent 70%
-    ),
-    radial-gradient(
-      50% 45% at 100% 20%,
-      oklch(0.55 0.15 300 / 0.14),
-      transparent 70%
-    ),
-    radial-gradient(
-      40% 40% at 80% 100%,
-      oklch(0.62 0.16 290 / 0.1),
-      transparent 70%
-    );
+    radial-gradient(60% 50% at 15% 0%, rgb(201 165 116 / 0.12), transparent 70%),
+    radial-gradient(50% 45% at 100% 20%, rgb(124 152 133 / 0.1), transparent 70%),
+    radial-gradient(40% 40% at 80% 100%, rgb(61 58 79 / 0.08), transparent 70%);
 }

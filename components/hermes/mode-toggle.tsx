@@ -37,7 +37,7 @@ export function ModeToggle({
             className={cn(
               "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
               isActive
-                ? "bg-primary text-primary-foreground"
+                ? "bg-accent text-accent-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

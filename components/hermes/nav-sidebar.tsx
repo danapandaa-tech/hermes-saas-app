@@ -37,8 +37,8 @@ export function NavSidebar() {
     <aside className="flex h-full w-16 flex-col border-r border-sidebar-border bg-sidebar lg:w-64">
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 px-3 lg:px-5">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
-          <HermesMark className="size-5 text-primary" />
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/12 ring-1 ring-accent/25">
+          <HermesMark className="size-5 text-accent" />
         </div>
         <span className="hidden font-heading text-lg font-semibold tracking-tight text-sidebar-foreground lg:block">
           Hermes
@@ -67,7 +67,7 @@ export function NavSidebar() {
               <Icon
                 className={cn(
                   "size-5 shrink-0 transition-colors",
-                  isActive ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground",
+                  isActive ? "text-accent" : "text-muted-foreground group-hover:text-sidebar-foreground",
                 )}
               />
               <span className="hidden lg:block">{item.label}</span>
@@ -91,7 +91,7 @@ export function NavSidebar() {
                 className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-popover-foreground hover:bg-sidebar-accent"
               >
                 {ws}
-                {workspace === ws && <Check className="size-4 text-primary" />}
+                {workspace === ws && <Check className="size-4 text-accent" />}
               </button>
             ))}
           </div>

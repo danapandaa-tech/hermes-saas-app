@@ -47,8 +47,8 @@ export function ChatStream() {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6">
       <div className="flex flex-col items-center gap-2 pb-2 text-center">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
-          <span className="font-heading text-lg font-semibold text-primary">H</span>
+        <div className="flex size-12 items-center justify-center rounded-2xl bg-accent/12 ring-1 ring-accent/25">
+          <span className="font-heading text-lg font-semibold text-accent">H</span>
         </div>
         <h1 className="font-heading text-balance text-xl font-semibold text-foreground">
           Lumen Rebrand
@@ -74,7 +74,7 @@ function MessageBubble({ message }: { message: Message }) {
           "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
           isUser
             ? "bg-secondary text-secondary-foreground"
-            : "bg-primary/15 text-primary ring-1 ring-primary/30",
+            : "bg-accent/12 text-accent ring-1 ring-accent/25",
         )}
         aria-hidden="true"
       >
@@ -85,7 +85,7 @@ function MessageBubble({ message }: { message: Message }) {
           className={cn(
             "whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed",
             isUser
-              ? "rounded-tr-sm bg-primary text-primary-foreground"
+              ? "rounded-tr-sm bg-secondary text-secondary-foreground"
               : "rounded-tl-sm bg-card text-card-foreground ring-1 ring-border",
           )}
         >

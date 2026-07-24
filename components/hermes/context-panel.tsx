@@ -21,13 +21,13 @@ export function ContextPanel() {
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <p className="font-medium text-card-foreground">Lumen Rebrand</p>
-            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+            <span className="rounded-full bg-accent/12 px-2 py-0.5 text-xs font-medium text-accent">
               Active
             </span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">Brand identity · Due in 9 days</p>
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-            <div className="h-full w-2/5 rounded-full bg-primary" />
+            <div className="h-full w-2/5 rounded-full bg-accent" />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">3 of 8 tasks complete</p>
         </div>
@@ -56,9 +56,9 @@ export function ContextPanel() {
               className="flex items-center gap-3 rounded-lg border border-border bg-card/60 px-3 py-2.5"
             >
               {wf.status === "running" ? (
-                <Loader2 className="size-4 shrink-0 animate-spin text-primary" />
+                <Loader2 className="size-4 shrink-0 animate-spin text-accent" />
               ) : (
-                <CheckCircle2 className="size-4 shrink-0 text-primary" />
+                <CheckCircle2 className="size-4 shrink-0 text-accent" />
               )}
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-card-foreground">{wf.name}</p>
@@ -84,7 +84,7 @@ function Section({
   return (
     <section className={cn("mb-7")}>
       <div className="mb-3 flex items-center gap-2">
-        <Icon className="size-4 text-primary" />
+        <Icon className="size-4 text-accent" />
         <h2 className="font-heading text-sm font-semibold text-foreground">{title}</h2>
       </div>
       {children}
