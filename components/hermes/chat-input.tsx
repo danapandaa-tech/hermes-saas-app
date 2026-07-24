@@ -1,14 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { Paperclip, ArrowUp, Sparkles, ListChecks, FileText } from "lucide-react"
+import { Paperclip, ArrowUp, Sparkles, ListChecks, FileText, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/lib/store"
+import { useProjectStore } from "@/lib/project-store"
+import { useTaskStore } from "@/lib/task-store"
+import { useMemoryStore } from "@/lib/memory-store"
+import { useAuth } from "@/lib/use-auth"
 
 const quickActions = [
   { label: "Summarize project", icon: Sparkles },
   { label: "Create tasks", icon: ListChecks },
   { label: "Draft a note", icon: FileText },
+  { label: "Review my projects", icon: Zap },
 ]
 
 export function ChatInput() {
@@ -20,9 +25,61 @@ export function ChatInput() {
   const setIsLoading = useChatStore((state) => state.setIsLoading)
   const setError = useChatStore((state) => state.setError)
   const clearError = useChatStore((state) => state.clearError)
+  
+  const { userId } = useAuth()
+  const projects = useProjectStore((state) => state.projects)
+  const addProject = useProjectStore((state) => state.addProject)
+  const tasks = useTaskStore((state) => state.tasks)
+  const addTask = useTaskStore((state) => state.addTask)
 
   const handleQuickAction = (action: string) => {
     setValue(action)
+  }
+  
+  const handleCommand = (command: string) => {
+    if (command.startsWith('/create project ')) {
+      const name = command.replace('/create project ', '')
+      if (name.trim()) {
+        const project = {
+          id: `proj_${Date.now()}`,
+          userId,
+          name: name.trim(),
+          description: '',
+          status: 'active' as const,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+        addProject(project)
+        setValue('')
+        setError(null)
+        // Show confirmation
+        const msg = { id: Date.now().toString(), role: 'assistant' as const, content: `✓ Created project "${name}"` }
+        addMessage(msg)
+        return true
+      }
+    } else if (command.startsWith('/create task ')) {
+      const title = command.replace('/create task ', '')
+      if (title.trim() && projects.length > 0) {
+        const task = {
+          id: `task_${Date.now()}`,
+          projectId: projects[0].id,
+          userId,
+          title: title.trim(),
+          description: undefined,
+          status: 'todo' as const,
+          priority: 'medium' as const,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+        addTask(task)
+        setValue('')
+        setError(null)
+        const msg = { id: Date.now().toString(), role: 'assistant' as const, content: `✓ Created task "${title}" in ${projects[0].name}` }
+        addMessage(msg)
+        return true
+      }
+    }
+    return false
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,10 +87,19 @@ export function ChatInput() {
     if (!value.trim() || isLoading) return
 
     clearError()
+    const trimmedValue = value.trim()
+    
+    // Check if it's a command
+    if (trimmedValue.startsWith('/')) {
+      if (handleCommand(trimmedValue)) {
+        return
+      }
+    }
+    
     const userMessage = {
       id: Date.now().toString(),
       role: "user" as const,
-      content: value.trim(),
+      content: trimmedValue,
     }
 
     addMessage(userMessage)

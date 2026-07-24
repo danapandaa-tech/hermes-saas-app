@@ -69,7 +69,28 @@ export function ChatStream() {
 }
 
 function MessageBubble({ message }: { message: { id: string; role: string; content: string } }) {
+  const { useMemoryStore } = require("@/lib/memory-store")
+  const { useProjectStore } = require("@/lib/project-store")
+  const addMemory = useMemoryStore((state: any) => state.addMemory)
+  const selectedProjectId = useProjectStore((state: any) => state.selectedProjectId)
+  
   const isUser = message.role === "user"
+  
+  const handleSaveToMemory = () => {
+    const { getCurrentUserId } = require("@/lib/auth-context")
+    const userId = getCurrentUserId()
+    const memory = {
+      id: `mem_${Date.now()}`,
+      userId,
+      projectId: selectedProjectId,
+      type: isUser ? "decision" as const : ("insight" as const),
+      title: message.content.slice(0, 50) + (message.content.length > 50 ? "..." : ""),
+      content: message.content,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    addMemory(memory)
+  }
   return (
     <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
       <div
@@ -81,7 +102,7 @@ function MessageBubble({ message }: { message: { id: string; role: string; conte
       >
         {isUser ? <span className="font-medium">AM</span> : <HermesMark className="size-4 text-primary" />}
       </div>
-      <div className={cn("flex max-w-[80%] flex-col gap-1", isUser ? "items-end" : "items-start")}>
+      <div className={cn("group/msg flex max-w-[80%] flex-col gap-1", isUser ? "items-end" : "items-start")}>
         <div
           className={cn(
             "whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed",
@@ -92,6 +113,15 @@ function MessageBubble({ message }: { message: { id: string; role: string; conte
         >
           {message.content}
         </div>
+        {!isUser && (
+          <button
+            onClick={handleSaveToMemory}
+            className="text-xs text-muted-foreground opacity-0 transition-opacity group-hover/msg:opacity-100 hover:text-foreground"
+            title="Save this message to memory"
+          >
+            Save to memory
+          </button>
+        )}
       </div>
     </div>
   )
