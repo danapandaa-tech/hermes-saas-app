@@ -1,4 +1,7 @@
+"use client"
+
 import { cn } from "@/lib/utils"
+import { useChatStore } from "@/lib/store"
 
 function HermesMark({ className }: { className?: string }) {
   return (
@@ -12,50 +15,11 @@ function HermesMark({ className }: { className?: string }) {
   )
 }
 
-type Message = {
-  id: number
-  role: "user" | "hermes"
-  content: string
-  time: string
-}
 
-const messages: Message[] = [
-  {
-    id: 1,
-    role: "user",
-    content: "Help me prep the kickoff for the Lumen rebrand. What should I tackle first this week?",
-    time: "9:02 AM",
-  },
-  {
-    id: 2,
-    role: "hermes",
-    content:
-      "Let's keep it calm and focused. I pulled the Lumen project context — there are 3 open tasks and a draft brief in your Vault. I'd start by locking the brand direction before touching deliverables.",
-    time: "9:02 AM",
-  },
-  {
-    id: 3,
-    role: "hermes",
-    content:
-      "Here's a gentle plan for the week:\n• Mon — Confirm tone + moodboard with the client\n• Wed — Draft 2 logo directions\n• Fri — Send a short progress note\n\nWant me to turn this into tasks and schedule the Friday note as an automation?",
-    time: "9:03 AM",
-  },
-  {
-    id: 4,
-    role: "user",
-    content: "Yes, create the tasks and set up the Friday briefing automation.",
-    time: "9:05 AM",
-  },
-  {
-    id: 5,
-    role: "hermes",
-    content:
-      "Done. I added 3 tasks to the Lumen rebrand and queued the “Daily briefing” workflow to send Friday at 4 PM. You'll see it under Active workflows on the right.",
-    time: "9:05 AM",
-  },
-]
 
 export function ChatStream() {
+  const messages = useChatStore((state: any) => state.messages)
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6">
       <div className="flex flex-col items-center gap-3 pb-6 text-center">
@@ -80,24 +44,18 @@ export function ChatStream() {
   )
 }
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message }: { message: any }) {
   const isUser = message.role === "user"
   return (
     <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
       <div
         className={cn(
           "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
-            isUser
-              ? "hermes-avatar-user"
-              : "bg-primary/15 text-primary ring-1 ring-primary/25",
+          isUser ? "hermes-avatar-user" : "bg-primary/15 text-primary ring-1 ring-primary/25",
         )}
         aria-hidden="true"
       >
-        {isUser ? (
-          <span className="font-medium">AM</span>
-        ) : (
-          <HermesMark className="size-4 text-primary" />
-        )}
+        {isUser ? <span className="font-medium">AM</span> : <HermesMark className="size-4 text-primary" />}
       </div>
       <div className={cn("flex max-w-[80%] flex-col gap-1", isUser ? "items-end" : "items-start")}>
         <div
@@ -110,7 +68,6 @@ function MessageBubble({ message }: { message: Message }) {
         >
           {message.content}
         </div>
-        <span className="px-1 font-mono text-[11px] text-muted-foreground">{message.time}</span>
       </div>
     </div>
   )
