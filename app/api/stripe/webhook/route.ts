@@ -1,6 +1,9 @@
 import type Stripe from 'stripe'
 import { getStripe } from '@/lib/billing/stripe'
-import { upsertSubscriptionFromStripe } from '@/lib/billing/subscriptions'
+import {
+  syncCheckoutCustomer,
+  upsertSubscriptionFromStripe,
+} from '@/lib/billing/subscriptions'
 
 export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
@@ -22,6 +25,10 @@ export async function POST(request: Request) {
     )
   } catch {
     return Response.json({ error: 'Invalid Stripe signature' }, { status: 400 })
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    await syncCheckoutCustomer(event.data.object)
   }
 
   if (

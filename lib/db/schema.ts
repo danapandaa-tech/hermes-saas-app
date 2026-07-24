@@ -1,4 +1,12 @@
-import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  unique,
+} from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -6,6 +14,8 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('emailVerified').notNull().default(false),
   image: text('image'),
+  stripeCustomerId: text('stripeCustomerId'),
+  tier: text('tier').notNull().default('free'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
@@ -50,6 +60,21 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updatedAt').defaultNow(),
 })
 
+export const workspaces = pgTable('workspaces', {
+  id: text('id').primaryKey(),
+  userId: text('userId').notNull(),
+  name: text('name').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+})
+
+export const messages = pgTable('messages', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspaceId').notNull(),
+  role: text('role').notNull(),
+  content: text('content').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+})
+
 export const projects = pgTable('projects', {
   id: text('id').primaryKey(),
   userId: text('userId').notNull(),
@@ -73,8 +98,11 @@ export const workflows = pgTable('workflows', {
   id: text('id').primaryKey(),
   userId: text('userId').notNull(),
   projectId: text('projectId'),
+  workspaceId: text('workspaceId'),
   name: text('name').notNull(),
-  status: text('status').notNull().default('idle'),
+  title: text('title'),
+  status: text('status').notNull().default('pending'),
+  sourceMessageId: text('sourceMessageId'),
   schedule: text('schedule'),
   lastRunAt: timestamp('lastRunAt'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
@@ -94,6 +122,22 @@ export const subscriptions = pgTable('subscriptions', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
+export const usage = pgTable(
+  'usage',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('userId').notNull(),
+    period: text('period').notNull(),
+    tasksCreated: integer('tasksCreated').notNull().default(0),
+    projectsCreated: integer('projectsCreated').notNull().default(0),
+    workflowsCreated: integer('workflowsCreated').notNull().default(0),
+    updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  },
+  (table) => [
+    unique('usage_userId_period_key').on(table.userId, table.period),
+  ],
+)
+
 export const usageEvents = pgTable('usage_events', {
   id: text('id').primaryKey(),
   userId: text('userId').notNull(),
@@ -101,3 +145,16 @@ export const usageEvents = pgTable('usage_events', {
   quantity: integer('quantity').notNull().default(1),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
 })
+
+export const usageCounters = pgTable(
+  'usage_counters',
+  {
+    userId: text('userId').notNull(),
+    month: text('month').notNull(),
+    workflowRunsCount: integer('workflowRunsCount').notNull().default(0),
+    updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  },
+  (table) => [
+    unique('usage_counters_userId_month_key').on(table.userId, table.month),
+  ],
+)

@@ -1,63 +1,66 @@
-import { and, count, eq, gte, sql } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { projects, subscriptions, usageEvents, workflows } from '@/lib/db/schema'
+import { usageCounters, user } from '@/lib/db/schema'
 
-export const FREE_LIMITS = {
-  messages: 100,
-  projects: 3,
-  workflows: 5,
-} as const
+export const FREE_WORKFLOW_RUNS_PER_MONTH = 15
 
 export type Plan = 'free' | 'paid'
-export type UsageKind = 'message' | 'workflow_run'
+
+function currentMonth() {
+  return new Date().toISOString().slice(0, 7)
+}
 
 export async function getPlan(userId: string): Promise<Plan> {
-  const [subscription] = await db
-    .select({ status: subscriptions.status })
-    .from(subscriptions)
-    .where(eq(subscriptions.userId, userId))
+  const [account] = await db
+    .select({ tier: user.tier })
+    .from(user)
+    .where(eq(user.id, userId))
     .limit(1)
 
-  return subscription && ['active', 'trialing'].includes(subscription.status) ? 'paid' : 'free'
+  return account?.tier === 'paid' ? 'paid' : 'free'
 }
 
-export async function getUsageSummary(userId: string) {
-  const monthStart = new Date()
-  monthStart.setUTCDate(1)
-  monthStart.setUTCHours(0, 0, 0, 0)
-
-  const [[messageUsage], [projectUsage], [workflowUsage]] = await Promise.all([
-    db
-      .select({ total: sql<number>`coalesce(sum(${usageEvents.quantity}), 0)::int` })
-      .from(usageEvents)
-      .where(and(eq(usageEvents.userId, userId), eq(usageEvents.kind, 'message'), gte(usageEvents.createdAt, monthStart))),
-    db.select({ total: count() }).from(projects).where(eq(projects.userId, userId)),
-    db.select({ total: count() }).from(workflows).where(eq(workflows.userId, userId)),
-  ])
+export async function getWorkflowUsage(userId: string) {
+  const month = currentMonth()
+  const [counter] = await db
+    .select({ count: usageCounters.workflowRunsCount })
+    .from(usageCounters)
+    .where(
+      and(
+        eq(usageCounters.userId, userId),
+        eq(usageCounters.month, month),
+      ),
+    )
+    .limit(1)
 
   return {
-    messages: messageUsage?.total ?? 0,
-    projects: projectUsage?.total ?? 0,
-    workflows: workflowUsage?.total ?? 0,
+    month,
+    completedRuns: counter?.count ?? 0,
+    limit: FREE_WORKFLOW_RUNS_PER_MONTH,
   }
 }
 
-export async function assertWithinLimit(
-  userId: string,
-  resource: keyof typeof FREE_LIMITS,
-) {
+export async function assertWorkflowRunAvailable(userId: string) {
   if ((await getPlan(userId)) === 'paid') return
-  const usage = await getUsageSummary(userId)
-  if (usage[resource] >= FREE_LIMITS[resource]) {
-    throw new Error(`Free plan limit reached for ${resource}`)
+
+  const usage = await getWorkflowUsage(userId)
+  if (usage.completedRuns >= usage.limit) {
+    throw new Error(
+      'You have reached 15 completed workflow runs this month. Chat and capture remain unlimited; upgrade for unlimited automation.',
+    )
   }
 }
 
-export async function recordUsage(userId: string, kind: UsageKind, quantity = 1) {
-  await db.insert(usageEvents).values({
-    id: crypto.randomUUID(),
-    userId,
-    kind,
-    quantity,
-  })
+export async function recordCompletedWorkflowRun(userId: string) {
+  const month = currentMonth()
+
+  await db
+    .insert(usageCounters)
+    .values({ userId, month, workflowRunsCount: 1 })
+    .onConflictDoUpdate({
+      target: [usageCounters.userId, usageCounters.month],
+      set: {
+        workflowRunsCount: sql`${usageCounters.workflowRunsCount} + 1`,
+      },
+    })
 }

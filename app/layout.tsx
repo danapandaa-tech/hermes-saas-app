@@ -20,23 +20,6 @@ export const metadata: Metadata = {
   description:
     'Hermes unifies chat, projects, knowledge, and automations in one calm, mythic-tech workspace.',
   generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
 }
 
 export const viewport: Viewport = {
@@ -55,14 +38,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`dark ${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable} bg-background`}
     >
-      {/* Blocking script: reads localStorage before first paint to avoid theme flash */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `(function(){var t=localStorage.getItem('hermes-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}})()`,
-        }}
-      />
+      <head>
+        {/* Reads the saved theme before first paint to avoid a color flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('hermes-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}})()`,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

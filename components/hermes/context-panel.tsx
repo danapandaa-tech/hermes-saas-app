@@ -1,4 +1,13 @@
-import { FolderKanban, Brain, Workflow, CheckCircle2, Loader2 } from "lucide-react"
+import {
+  FolderKanban,
+  Brain,
+  Workflow,
+  CheckCircle2,
+  Loader2,
+  Mail,
+  Route,
+  Share2,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const memorySnippets = [
@@ -27,7 +36,7 @@ export function ContextPanel() {
           </div>
           <p className="mt-1 font-mono text-[11px] text-muted-foreground">Brand identity · Due in 9 days</p>
           <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-muted">
-            <div className="h-full w-2/5 rounded-full bg-gradient-to-r from-primary to-secondary" />
+            <div className="h-full w-2/5 rounded-full bg-primary" />
           </div>
           <p className="mt-2 font-mono text-[11px] text-muted-foreground">3 of 8 tasks complete</p>
         </div>
@@ -68,7 +77,56 @@ export function ContextPanel() {
           ))}
         </ul>
       </Section>
+
+      <Section icon={Workflow} title="Plan & integrations">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-card-foreground">Free plan</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Unlimited chat and capture. Up to 15 completed workflow runs each month.
+              </p>
+            </div>
+            <span className="rounded-full border border-border bg-muted px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Free
+            </span>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
+            <PaidFeature icon={Mail} label="Email monitoring" />
+            <PaidFeature icon={Route} label="Marketplace routing" />
+            <PaidFeature icon={Share2} label="Buffer publishing" />
+          </div>
+
+          <button
+            type="button"
+            disabled
+            title="Upgrade becomes available after account authentication is configured"
+            className="mt-4 w-full cursor-not-allowed rounded-lg bg-primary/70 px-3 py-2 text-xs font-medium text-primary-foreground opacity-80"
+          >
+            Upgrade setup pending
+          </button>
+        </div>
+      </Section>
     </aside>
+  )
+}
+
+function PaidFeature({
+  icon: Icon,
+  label,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+}) {
+  return (
+    <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
+      <Icon className="size-3.5 text-primary/70" />
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      <span className="font-mono text-[9px] uppercase tracking-wider text-primary">
+        Paid
+      </span>
+    </div>
   )
 }
 
