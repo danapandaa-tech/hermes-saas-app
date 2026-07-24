@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { PanelRight, Sparkles, Sun, Moon } from "lucide-react"
+import { PanelRight, Sparkles, Sun, Moon, X } from "lucide-react"
 import { NavSidebar } from "@/components/hermes/nav-sidebar"
 import { ChatStream } from "@/components/hermes/chat-stream"
 import { ChatInput } from "@/components/hermes/chat-input"
@@ -9,18 +9,57 @@ import { ContextPanel } from "@/components/hermes/context-panel"
 import { ModeToggle, type ChatMode } from "@/components/hermes/mode-toggle"
 import { ThreadAnimation } from "@/components/hermes/thread-animation"
 import { useTheme } from "@/lib/use-theme"
+import { useViewStore } from "@/lib/view-store"
+import { ResearchView } from "@/components/hermes/views/research-view"
+import { AutomationsView } from "@/components/hermes/views/automations-view"
+import { ProjectsView } from "@/components/hermes/views/projects-view"
+import { KnowledgeView } from "@/components/hermes/views/knowledge-view"
+import { DocumentsView } from "@/components/hermes/views/documents-view"
+import { IntegrationsView } from "@/components/hermes/views/integrations-view"
+import { SettingsView } from "@/components/hermes/views/settings-view"
 
 export default function Page() {
   const [mode, setMode] = useState<ChatMode>("Chat")
   const [threadActive, setThreadActive] = useState(false)
+  const [contextOpen, setContextOpen] = useState(true)
   const sendButtonRef = useRef<HTMLButtonElement>(null)
   const workflowRef = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
+  const activeView = useViewStore((state) => state.activeView)
+  const closeSidebar = useViewStore((state) => state.closeSidebar)
 
   const handleThreadDemo = () => {
     setThreadActive(true)
     setTimeout(() => setThreadActive(false), 1500)
   }
+
+  const renderView = () => {
+    switch (activeView) {
+      case "research":
+        return <ResearchView />
+      case "automations":
+        return <AutomationsView />
+      case "projects":
+        return <ProjectsView />
+      case "knowledge":
+        return <KnowledgeView />
+      case "documents":
+        return <DocumentsView />
+      case "integrations":
+        return <IntegrationsView />
+      case "settings":
+        return <SettingsView />
+      case "chat":
+      default:
+        return (
+          <>
+            <ChatStream />
+          </>
+        )
+    }
+  }
+
+  const isChatView = activeView === "chat"
 
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-background">
@@ -31,27 +70,33 @@ export default function Page() {
       />
       <NavSidebar />
 
-      {/* Main chat workspace */}
+      {/* Main workspace */}
       <main className="hermes-aurora flex min-w-0 flex-1 flex-col">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-border px-4 sm:px-6">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-border px-4 sm:px-6 md:px-8">
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground">{mode}</p>
-            <p className="hidden truncate font-mono text-[11px] text-muted-foreground/60 sm:block">
-              Lumen Rebrand · Solo Studio
-            </p>
+            <p className="truncate text-sm font-medium text-foreground capitalize">{activeView}</p>
+            {isChatView && (
+              <p className="hidden truncate font-mono text-[11px] text-muted-foreground/60 sm:block">
+                Lumen Rebrand · Solo Studio
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            <ModeToggle value={mode} onChange={setMode} />
-            <button
-              ref={sendButtonRef}
-              type="button"
-              onClick={handleThreadDemo}
-              className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
-              title="Demo: See The Thread animation when a task is created"
-            >
-              <Sparkles className="size-3.5" />
-              <span className="hidden sm:block">Demo Thread</span>
-            </button>
+            {isChatView && (
+              <>
+                <ModeToggle value={mode} onChange={setMode} />
+                <button
+                  ref={sendButtonRef}
+                  type="button"
+                  onClick={handleThreadDemo}
+                  className="hidden sm:flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                  title="Demo: See The Thread animation when a task is created"
+                >
+                  <Sparkles className="size-3.5" />
+                  <span>Demo Thread</span>
+                </button>
+              </>
+            )}
             {/* Discrete day/night toggle */}
             <button
               type="button"
@@ -66,28 +111,58 @@ export default function Page() {
                 <Moon className="size-4" />
               )}
             </button>
-            <button
-              type="button"
-              className="flex size-9 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:text-foreground xl:hidden"
-            >
-              <PanelRight className="size-5" />
-              <span className="sr-only">Toggle context panel</span>
-            </button>
+            {isChatView && (
+              <button
+                type="button"
+                onClick={() => setContextOpen(!contextOpen)}
+                className="hidden lg:flex size-9 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <PanelRight className="size-5" />
+                <span className="sr-only">Toggle context panel</span>
+              </button>
+            )}
           </div>
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <ChatStream />
+          {renderView()}
         </div>
 
-        <div className="shrink-0">
-          <ChatInput />
-        </div>
+        {isChatView && (
+          <div className="shrink-0 border-t border-border">
+            <ChatInput />
+          </div>
+        )}
       </main>
 
-      <div ref={workflowRef}>
-        <ContextPanel />
-      </div>
+      {isChatView && (
+        <div ref={workflowRef} className="hidden lg:flex">
+          <ContextPanel />
+        </div>
+      )}
+
+      {/* Mobile context panel drawer */}
+      {isChatView && contextOpen && (
+        <>
+          <button
+            type="button"
+            onClick={() => setContextOpen(false)}
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            aria-hidden="true"
+          />
+          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm border-l border-border bg-background lg:hidden overflow-y-auto">
+            <button
+              type="button"
+              onClick={() => setContextOpen(false)}
+              className="absolute right-4 top-4 size-8 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
+            >
+              <X className="size-5" />
+              <span className="sr-only">Close context panel</span>
+            </button>
+            <ContextPanel />
+          </div>
+        </>
+      )}
     </div>
   )
 }

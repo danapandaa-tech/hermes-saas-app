@@ -12,62 +12,102 @@ import {
   Settings,
   ChevronsUpDown,
   Check,
+  Menu,
+  X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useViewStore, type ViewType } from "@/lib/view-store"
 
-const navItems = [
-  { label: "Chat", icon: MessageSquare },
-  { label: "Projects", icon: FolderKanban },
-  { label: "Knowledge", icon: BookOpen },
-  { label: "Automations", icon: Workflow },
-  { label: "Research", icon: Telescope },
-  { label: "Documents", icon: FileText },
-  { label: "Integrations", icon: Plug },
-  { label: "Settings", icon: Settings },
+const navItems: Array<{ label: string; icon: React.ComponentType<{ className?: string }>; view: ViewType }> = [
+  { label: "Chat", icon: MessageSquare, view: "chat" },
+  { label: "Projects", icon: FolderKanban, view: "projects" },
+  { label: "Knowledge", icon: BookOpen, view: "knowledge" },
+  { label: "Automations", icon: Workflow, view: "automations" },
+  { label: "Research", icon: Telescope, view: "research" },
+  { label: "Documents", icon: FileText, view: "documents" },
+  { label: "Integrations", icon: Plug, view: "integrations" },
+  { label: "Settings", icon: Settings, view: "settings" },
 ]
 
 const workspaces = ["Solo Studio", "Client Work", "Personal"]
 
 export function NavSidebar() {
-  const [active, setActive] = useState("Chat")
+  const activeView = useViewStore((state) => state.activeView)
+  const setActiveView = useViewStore((state) => state.setActiveView)
+  const sidebarOpen = useViewStore((state) => state.sidebarOpen)
+  const toggleSidebar = useViewStore((state) => state.toggleSidebar)
   const [switcherOpen, setSwitcherOpen] = useState(false)
   const [workspace, setWorkspace] = useState(workspaces[0])
 
   return (
-    <aside className="flex h-full w-16 flex-col border-r border-sidebar-border bg-sidebar lg:w-64">
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        type="button"
+        onClick={toggleSidebar}
+        className="fixed left-4 top-4 z-50 md:hidden flex size-10 items-center justify-center rounded-lg bg-sidebar border border-sidebar-border text-muted-foreground hover:text-foreground"
+        aria-label="Toggle sidebar"
+      >
+        {sidebarOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+      </button>
+
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="fixed inset-0 z-20 bg-black/50 md:hidden"
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={cn(
+          "fixed md:relative z-30 flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar transition-transform duration-200",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        )}
+      >
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-3 lg:px-5">
+      <div className="flex h-16 items-center gap-3 px-4">
         <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/20 ring-1 ring-primary/35">
           <HermesMark className="size-5 text-primary" />
         </div>
-        <span className="hidden font-heading text-xl font-medium tracking-wide text-sidebar-foreground lg:block">
-          Hermes
-        </span>
+        <span className="font-heading text-xl font-medium tracking-wide text-sidebar-foreground">Hermes</span>
       </div>
 
       {/* Nav */}
-      <nav className="flex flex-1 flex-col overflow-y-auto px-2 py-4 lg:px-3">
+      <nav className="flex flex-1 flex-col overflow-y-auto px-2 py-4">
         {/* Primary section label — mono eyebrow */}
-        <p className="mb-1.5 hidden px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50 lg:block">
+        <p className="mb-1.5 px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50">
           Workspace
         </p>
         {navItems.slice(0, 5).map((item) => (
-          <NavItem key={item.label} item={item} isActive={active === item.label} onClick={() => setActive(item.label)} />
+          <NavItem
+            key={item.label}
+            item={item}
+            isActive={activeView === item.view}
+            onClick={() => setActiveView(item.view)}
+          />
         ))}
         {/* Divider before utility items */}
-        <div className="my-3 mx-3 hidden border-t border-sidebar-border lg:block" />
-        <p className="mb-1.5 hidden px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50 lg:block">
+        <div className="my-3 mx-3 border-t border-sidebar-border" />
+        <p className="mb-1.5 px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50">
           Library
         </p>
         {navItems.slice(5).map((item) => (
-          <NavItem key={item.label} item={item} isActive={active === item.label} onClick={() => setActive(item.label)} />
+          <NavItem
+            key={item.label}
+            item={item}
+            isActive={activeView === item.view}
+            onClick={() => setActiveView(item.view)}
+          />
         ))}
       </nav>
 
       {/* Workspace switcher + avatar */}
-      <div className="relative border-t border-sidebar-border p-2 lg:p-3">
+      <div className="relative border-t border-sidebar-border p-3">
         {switcherOpen && (
-          <div className="absolute bottom-full left-2 right-2 mb-2 overflow-hidden rounded-xl border border-sidebar-border bg-popover p-1 shadow-xl lg:left-3 lg:right-3">
+          <div className="absolute bottom-full left-3 right-3 mb-2 overflow-hidden rounded-xl border border-sidebar-border bg-popover p-1 shadow-xl">
             {workspaces.map((ws) => (
               <button
                 key={ws}
@@ -92,14 +132,15 @@ export function NavSidebar() {
           <div className="flex size-9 shrink-0 items-center justify-center rounded-full hermes-avatar-user text-sm font-semibold">
             AM
           </div>
-          <div className="hidden min-w-0 flex-1 lg:block">
+          <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-sidebar-foreground">Ada Maro</p>
             <p className="truncate text-xs text-muted-foreground">{workspace}</p>
           </div>
-          <ChevronsUpDown className="hidden size-4 shrink-0 text-muted-foreground lg:block" />
+          <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
         </button>
       </div>
     </aside>
+    </>
   )
 }
 
@@ -108,7 +149,7 @@ function NavItem({
   isActive,
   onClick,
 }: {
-  item: { label: string; icon: React.ComponentType<{ className?: string }> }
+  item: { label: string; icon: React.ComponentType<{ className?: string }>; view: ViewType }
   isActive: boolean
   onClick: () => void
 }) {
@@ -119,8 +160,7 @@ function NavItem({
       onClick={onClick}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-        "justify-center lg:justify-start",
+        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors justify-start",
         isActive
           ? "bg-sidebar-accent text-sidebar-foreground"
           : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
@@ -132,7 +172,7 @@ function NavItem({
           isActive ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground",
         )}
       />
-      <span className="hidden lg:block">{item.label}</span>
+      <span>{item.label}</span>
     </button>
   )
 }
