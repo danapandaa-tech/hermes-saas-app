@@ -41,12 +41,12 @@ export function ModeToggle({
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <Icon className={cn("size-4", isActive ? "text-accent" : "")} />
+            <Icon className={cn("size-4", isActive ? "text-primary" : "")} />
             <span className="hidden sm:block">{mode.label}</span>
             {/* Underline indicator */}
             {isActive && (
               <span
-                className="absolute bottom-0 left-3.5 right-3.5 h-px bg-accent"
+                className="absolute bottom-0 left-3.5 right-3.5 h-0.5 rounded-full bg-primary"
                 aria-hidden="true"
               />
             )}

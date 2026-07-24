@@ -21,15 +21,15 @@ export function ContextPanel() {
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-card-foreground">Lumen Rebrand</p>
-            <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-accent/80">
+            <span className="rounded-full bg-primary/15 px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-wider text-primary">
               Active
             </span>
           </div>
-          <p className="mt-1 font-mono text-[11px] text-muted-foreground/70">Brand identity · Due in 9 days</p>
-          <div className="mt-3 h-px w-full overflow-hidden bg-border">
-            <div className="h-full w-2/5 bg-accent/60" />
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground">Brand identity · Due in 9 days</p>
+          <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-muted">
+            <div className="h-full w-2/5 rounded-full bg-gradient-to-r from-primary to-secondary" />
           </div>
-          <p className="mt-2 font-mono text-[11px] text-muted-foreground/70">3 of 8 tasks complete</p>
+          <p className="mt-2 font-mono text-[11px] text-muted-foreground">3 of 8 tasks complete</p>
         </div>
       </Section>
 
@@ -39,7 +39,7 @@ export function ContextPanel() {
           {memorySnippets.map((snippet) => (
             <li
               key={snippet}
-              className="border-l-2 border-accent/20 bg-card/30 pl-3 pr-2 py-2 text-xs leading-relaxed text-muted-foreground hover:border-accent/50 hover:text-foreground/80 transition-colors cursor-default"
+              className="border-l-2 border-primary/25 bg-primary/5 pl-3 pr-2 py-2 text-xs leading-relaxed text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground cursor-default"
             >
               {snippet}
             </li>
@@ -56,9 +56,9 @@ export function ContextPanel() {
               className="flex items-center gap-3 rounded-lg border border-border bg-card/60 px-3 py-2.5"
             >
               {wf.status === "running" ? (
-                <Loader2 className="size-4 shrink-0 animate-spin text-accent" />
+                <Loader2 className="size-4 shrink-0 animate-spin text-primary" />
               ) : (
-                <CheckCircle2 className="size-4 shrink-0 text-accent" />
+                <CheckCircle2 className="size-4 shrink-0 text-secondary" />
               )}
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-card-foreground">{wf.name}</p>
@@ -84,7 +84,7 @@ function Section({
   return (
     <section className={cn("mb-7")}>
       <div className="mb-3 flex items-center gap-2">
-        <Icon className="size-3.5 text-accent/70" />
+        <Icon className="size-3.5 text-primary/70" />
         <h2 className="font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{title}</h2>
       </div>
       {children}

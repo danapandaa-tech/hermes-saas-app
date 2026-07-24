@@ -23,9 +23,9 @@ export function ChatInput() {
               key={action.label}
               type="button"
               onClick={() => setValue((v) => (v ? v : action.label))}
-              className="flex items-center gap-2 border-l-2 border-accent/30 bg-card/40 pl-3 pr-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-accent/70 hover:bg-card/70 hover:text-foreground"
+              className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/8 pl-3 pr-4 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-primary/15 hover:text-foreground"
             >
-              <Icon className="size-3 text-accent/70" />
+              <Icon className="size-3 text-primary" />
               {action.label}
             </button>
           )
@@ -37,7 +37,7 @@ export function ChatInput() {
           e.preventDefault()
           setValue("")
         }}
-        className="flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-2 shadow-lg backdrop-blur transition-colors focus-within:border-accent/50"
+        className="flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-2 shadow-lg backdrop-blur transition-all focus-within:border-primary/60 focus-within:shadow-primary/10 focus-within:shadow-xl"
       >
         <label className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
           <Paperclip className="size-5" />
@@ -59,7 +59,7 @@ export function ChatInput() {
           className={cn(
             "flex size-9 shrink-0 items-center justify-center rounded-xl transition-colors",
             value.trim()
-              ? "bg-accent text-accent-foreground hover:opacity-90"
+              ? "bg-primary text-white shadow-md shadow-primary/30 hover:bg-primary/90"
               : "bg-muted text-muted-foreground",
           )}
         >

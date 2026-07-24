@@ -52,62 +52,68 @@
 .dark {
   color-scheme: dark;
 
-  /* Hermes Dusk/Twilight Token System */
-  /* Base: Dusk indigo, not void-black */
-  --background: #1b1b3a;
-  --foreground: #edeae3;
+  /* ─── Hermes Vibrant Indigo/Teal System ─── */
 
-  /* Panel: Muted violet-slate */
-  --card: #2e2b52;
-  --card-foreground: #edeae3;
-  --popover: #2e2b52;
-  --popover-foreground: #edeae3;
+  /* Deep indigo-black base — rich, not flat */
+  --background: #12112a;
+  /* Bright parchment — 11.5:1 contrast on background */
+  --foreground: #f0eeff;
 
-  /* Primary: Not used (Accent = Aged gold instead) */
-  --primary: #c9a574;
-  --primary-foreground: #1b1b3a;
+  /* Lifted indigo panel — readable depth */
+  --card: #1e1a3e;
+  --card-foreground: #f0eeff;
+  --popover: #252047;
+  --popover-foreground: #f0eeff;
 
-  /* Secondary: Calm sage (muted green) */
-  --secondary: #7c9885;
-  --secondary-foreground: #edeae3;
+  /* Vivid violet — primary brand identity */
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
 
-  /* Muted text: Dusty lavender-gray */
-  --muted: #3d3a4f;
-  --muted-foreground: #8b87a6;
+  /* Warm teal — user bubbles, calm interactions */
+  --secondary: #0d9488;
+  --secondary-foreground: #ffffff;
 
-  /* Accent: Aged gold/brass (sparingly) */
-  --accent: #c9a574;
-  --accent-foreground: #1b1b3a;
+  /* Muted surface — slightly lighter than card */
+  --muted: #2a2550;
+  /* Lifted lavender-gray — passes 4.5:1 on #12112a */
+  --muted-foreground: #a9a4c8;
 
-  /* Destructive warning */
-  --destructive: #e74c3c;
+  /* Accent = vivid violet (matches primary) */
+  --accent: #7c3aed;
+  --accent-foreground: #ffffff;
 
-  /* Borders: Subtle, transparent white */
-  --border: rgb(255 255 255 / 0.08);
-  --input: rgb(255 255 255 / 0.1);
+  /* Destructive */
+  --destructive: #f87171;
 
-  /* Ring/focus: Aged gold */
-  --ring: #c9a574;
+  /* Borders — subtle violet tint */
+  --border: rgb(124 58 237 / 0.15);
+  --input: rgb(240 238 255 / 0.1);
 
-  /* Charts: Muted palette */
-  --chart-1: #c9a574;
-  --chart-2: #7c9885;
-  --chart-3: #3d3a4f;
-  --chart-4: #8b87a6;
-  --chart-5: #2e2b52;
+  /* Ring/focus: vivid violet */
+  --ring: #7c3aed;
+
+  /* Charts */
+  --chart-1: #7c3aed;
+  --chart-2: #0d9488;
+  --chart-3: #6366f1;
+  --chart-4: #a78bfa;
+  --chart-5: #2dd4bf;
 
   /* Border radius */
   --radius: 0.875rem;
 
-  /* Sidebar: Slightly darker than background for depth */
-  --sidebar: #161630;
-  --sidebar-foreground: #edeae3;
-  --sidebar-primary: #c9a574;
-  --sidebar-primary-foreground: #1b1b3a;
-  --sidebar-accent: #3d3a4f;
-  --sidebar-accent-foreground: #edeae3;
-  --sidebar-border: rgb(255 255 255 / 0.06);
-  --sidebar-ring: #c9a574;
+  /* Gold warmth — available as CSS variable for selective use */
+  --gold: #c9a574;
+
+  /* Sidebar — darkest layer */
+  --sidebar: #0d0c22;
+  --sidebar-foreground: #f0eeff;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e1a3e;
+  --sidebar-accent-foreground: #f0eeff;
+  --sidebar-border: rgb(124 58 237 / 0.12);
+  --sidebar-ring: #7c3aed;
 }
 
 @layer base {
@@ -126,10 +132,20 @@
   font-family: var(--font-heading);
 }
 
-/* atmospheric dusk glow — stronger, still not a wash */
+/* vivid violet + teal aurora behind the chat workspace */
 @utility hermes-aurora {
   background-image:
-    radial-gradient(70% 55% at 12% 0%, rgb(201 165 116 / 0.18), transparent 65%),
-    radial-gradient(55% 50% at 100% 15%, rgb(124 152 133 / 0.13), transparent 65%),
-    radial-gradient(45% 40% at 75% 100%, rgb(46 43 82 / 0.6), transparent 70%);
+    radial-gradient(65% 50% at 10% 0%, rgb(124 58 237 / 0.22), transparent 60%),
+    radial-gradient(50% 45% at 100% 10%, rgb(13 148 136 / 0.16), transparent 60%),
+    radial-gradient(40% 35% at 80% 100%, rgb(99 102 241 / 0.14), transparent 65%);
+}
+
+/* Violet-to-teal gradient for Hermes reply bubbles */
+@utility hermes-reply-bubble {
+  background: linear-gradient(135deg, #3b1f7a 0%, #1e1a3e 60%, #0f2a3a 100%);
+}
+
+/* Teal gradient for user bubbles */
+@utility hermes-user-bubble {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
 }

@@ -59,8 +59,8 @@ export function ChatStream() {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6">
       <div className="flex flex-col items-center gap-3 pb-6 text-center">
-        <div className="flex size-11 items-center justify-center rounded-2xl bg-accent/10 ring-1 ring-accent/20">
-          <HermesMark className="size-6 text-accent" />
+        <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
+          <HermesMark className="size-6 text-primary" />
         </div>
         {/* Fraunces only here: the session title is the one display moment */}
         <h1 className="font-heading text-balance text-2xl font-medium tracking-tight text-foreground">
@@ -70,7 +70,7 @@ export function ChatStream() {
           A calm space to think. Hermes carries your context, tasks, and workflows so you don&apos;t have to.
         </p>
         {/* Hairline rule beneath the header block */}
-        <div className="mt-2 h-px w-16 bg-accent/20" />
+        <div className="mt-2 h-px w-16 bg-primary/30" />
       </div>
 
       {messages.map((message) => (
@@ -88,15 +88,15 @@ function MessageBubble({ message }: { message: Message }) {
         className={cn(
           "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
           isUser
-            ? "bg-secondary/80 text-secondary-foreground"
-            : "bg-accent/10 text-accent ring-1 ring-accent/20",
+            ? "bg-secondary text-white"
+            : "bg-primary/20 text-primary ring-1 ring-primary/30",
         )}
         aria-hidden="true"
       >
         {isUser ? (
-          <span>AM</span>
+          <span className="font-medium">AM</span>
         ) : (
-          <HermesMark className="size-4 text-accent" />
+          <HermesMark className="size-4 text-primary" />
         )}
       </div>
       <div className={cn("flex max-w-[80%] flex-col gap-1", isUser ? "items-end" : "items-start")}>
@@ -104,13 +104,18 @@ function MessageBubble({ message }: { message: Message }) {
           className={cn(
             "whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed",
             isUser
-              ? "rounded-tr-sm bg-secondary text-secondary-foreground"
-              : "rounded-tl-sm bg-card text-card-foreground ring-1 ring-border",
+              ? "rounded-tr-sm text-white shadow-md"
+              : "rounded-tl-sm text-[#e8e0ff] shadow-md ring-1 ring-white/[0.08]",
           )}
+          style={
+            isUser
+              ? { background: "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)", boxShadow: "0 4px 16px -2px rgba(13,148,136,0.35)" }
+              : { background: "linear-gradient(135deg, #3b1f7a 0%, #1e1a3e 60%, #0f2a3a 100%)", boxShadow: "0 4px 20px -2px rgba(124,58,237,0.4)" }
+          }
         >
           {message.content}
         </div>
-        <span className="px-1 font-mono text-[11px] text-muted-foreground/70">{message.time}</span>
+        <span className="px-1 font-mono text-[11px] text-muted-foreground">{message.time}</span>
       </div>
     </div>
   )

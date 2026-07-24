@@ -44,7 +44,7 @@ export default function Page() {
               ref={sendButtonRef}
               type="button"
               onClick={handleThreadDemo}
-              className="flex items-center gap-2 rounded-lg border border-accent/30 bg-accent/8 px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-accent/15"
+              className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
               title="Demo: See The Thread animation when a task is created"
             >
               <Sparkles className="size-3.5" />

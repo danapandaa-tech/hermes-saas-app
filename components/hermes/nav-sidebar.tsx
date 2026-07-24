@@ -37,8 +37,8 @@ export function NavSidebar() {
     <aside className="flex h-full w-16 flex-col border-r border-sidebar-border bg-sidebar lg:w-64">
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 px-3 lg:px-5">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/12 ring-1 ring-accent/25">
-          <HermesMark className="size-5 text-accent" />
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/20 ring-1 ring-primary/35">
+          <HermesMark className="size-5 text-primary" />
         </div>
         <span className="hidden font-heading text-xl font-medium tracking-wide text-sidebar-foreground lg:block">
           Hermes
@@ -79,7 +79,7 @@ export function NavSidebar() {
                 className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-popover-foreground hover:bg-sidebar-accent"
               >
                 {ws}
-                {workspace === ws && <Check className="size-4 text-accent" />}
+                {workspace === ws && <Check className="size-4 text-primary" />}
               </button>
             ))}
           </div>
@@ -89,7 +89,7 @@ export function NavSidebar() {
           onClick={() => setSwitcherOpen((o) => !o)}
           className="flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-sidebar-accent/60"
         >
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-white">
             AM
           </div>
           <div className="hidden min-w-0 flex-1 lg:block">
@@ -129,7 +129,7 @@ function NavItem({
       <Icon
         className={cn(
           "size-4 shrink-0 transition-colors",
-          isActive ? "text-accent" : "text-muted-foreground group-hover:text-sidebar-foreground",
+          isActive ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground",
         )}
       />
       <span className="hidden lg:block">{item.label}</span>
