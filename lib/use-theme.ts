@@ -6,13 +6,11 @@ export type Theme = "dark" | "light"
 
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>("dark")
-  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem("hermes-theme")
     const initialTheme = (stored === "light" || stored === "dark" ? stored : "dark") as Theme
     setTheme(initialTheme)
-    setMounted(true)
 
     const root = document.documentElement
     if (initialTheme === "dark") {
@@ -23,7 +21,6 @@ export function useTheme() {
   }, [])
 
   useEffect(() => {
-    if (!mounted) return
     const root = document.documentElement
     if (theme === "dark") {
       root.classList.add("dark")
@@ -31,9 +28,9 @@ export function useTheme() {
       root.classList.remove("dark")
     }
     localStorage.setItem("hermes-theme", theme)
-  }, [theme, mounted])
+  }, [theme])
 
   const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"))
 
-  return { theme, toggle, mounted }
+  return { theme, toggle }
 }
