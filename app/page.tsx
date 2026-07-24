@@ -1,19 +1,21 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { PanelRight, Sparkles } from "lucide-react"
+import { PanelRight, Sparkles, Sun, Moon } from "lucide-react"
 import { NavSidebar } from "@/components/hermes/nav-sidebar"
 import { ChatStream } from "@/components/hermes/chat-stream"
 import { ChatInput } from "@/components/hermes/chat-input"
 import { ContextPanel } from "@/components/hermes/context-panel"
 import { ModeToggle, type ChatMode } from "@/components/hermes/mode-toggle"
 import { ThreadAnimation } from "@/components/hermes/thread-animation"
+import { useTheme } from "@/lib/use-theme"
 
 export default function Page() {
   const [mode, setMode] = useState<ChatMode>("Chat")
   const [threadActive, setThreadActive] = useState(false)
   const sendButtonRef = useRef<HTMLButtonElement>(null)
   const workflowRef = useRef<HTMLDivElement>(null)
+  const { theme, toggle } = useTheme()
 
   const handleThreadDemo = () => {
     setThreadActive(true)
@@ -49,6 +51,20 @@ export default function Page() {
             >
               <Sparkles className="size-3.5" />
               <span className="hidden sm:block">Demo Thread</span>
+            </button>
+            {/* Discrete day/night toggle */}
+            <button
+              type="button"
+              onClick={toggle}
+              aria-label={theme === "dark" ? "Switch to day mode" : "Switch to night mode"}
+              title={theme === "dark" ? "Day mode" : "Night mode"}
+              className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              {theme === "dark" ? (
+                <Sun className="size-4" />
+              ) : (
+                <Moon className="size-4" />
+              )}
             </button>
             <button
               type="button"

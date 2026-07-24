@@ -87,9 +87,9 @@ function MessageBubble({ message }: { message: Message }) {
       <div
         className={cn(
           "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
-          isUser
-            ? "bg-secondary text-white"
-            : "bg-primary/20 text-primary ring-1 ring-primary/30",
+            isUser
+              ? "hermes-avatar-user text-white"
+              : "bg-primary/15 text-primary ring-1 ring-primary/25",
         )}
         aria-hidden="true"
       >
@@ -104,14 +104,9 @@ function MessageBubble({ message }: { message: Message }) {
           className={cn(
             "whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed",
             isUser
-              ? "rounded-tr-sm text-white shadow-md"
-              : "rounded-tl-sm text-[#e8e0ff] shadow-md ring-1 ring-white/[0.08]",
+              ? "hermes-bubble-user rounded-tr-sm shadow-md"
+              : "hermes-bubble-hermes rounded-tl-sm shadow-md",
           )}
-          style={
-            isUser
-              ? { background: "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)", boxShadow: "0 4px 16px -2px rgba(13,148,136,0.35)" }
-              : { background: "linear-gradient(135deg, #3b1f7a 0%, #1e1a3e 60%, #0f2a3a 100%)", boxShadow: "0 4px 20px -2px rgba(124,58,237,0.4)" }
-          }
         >
           {message.content}
         </div>

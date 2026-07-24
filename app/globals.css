@@ -48,7 +48,66 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root,
+/* ─── Light / Day mode — vintage card aesthetic, no gradients ─── */
+:root {
+  color-scheme: light;
+
+  /* Aged paper base */
+  --background: #f5f0e8;
+  /* Warm near-black — readable, not harsh */
+  --foreground: #1c1917;
+
+  /* Clean white cards — distinct from warm bg */
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+
+  /* Deep violet — same hue family as dark, slightly desaturated */
+  --primary: #5b21b6;
+  --primary-foreground: #ffffff;
+
+  /* Muted teal */
+  --secondary: #0f766e;
+  --secondary-foreground: #ffffff;
+
+  /* Warm stone muted surface */
+  --muted: #ede7d9;
+  /* Stone gray — 5.8:1 on #f5f0e8 */
+  --muted-foreground: #78716c;
+
+  --accent: #5b21b6;
+  --accent-foreground: #ffffff;
+
+  --destructive: #dc2626;
+
+  /* Visible warm borders — cards need clear edges */
+  --border: #d6cebc;
+  --input: #d6cebc;
+
+  --ring: #5b21b6;
+
+  --chart-1: #5b21b6;
+  --chart-2: #0f766e;
+  --chart-3: #7c3aed;
+  --chart-4: #0d9488;
+  --chart-5: #78716c;
+
+  --radius: 0.875rem;
+  --gold: #b08040;
+
+  /* Sidebar — slightly warmer than background */
+  --sidebar: #ede7d9;
+  --sidebar-foreground: #1c1917;
+  --sidebar-primary: #5b21b6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e2d9c8;
+  --sidebar-accent-foreground: #1c1917;
+  --sidebar-border: #d6cebc;
+  --sidebar-ring: #5b21b6;
+}
+
+/* ─── Dark / Night mode — vibrant indigo/teal ─── */
 .dark {
   color-scheme: dark;
 
@@ -132,20 +191,55 @@
   font-family: var(--font-heading);
 }
 
-/* vivid violet + teal aurora behind the chat workspace */
+/* Dark mode aurora — suppressed in light mode */
 @utility hermes-aurora {
+  background-image: none;
+}
+.dark .hermes-aurora,
+.dark.hermes-aurora {
   background-image:
     radial-gradient(65% 50% at 10% 0%, rgb(124 58 237 / 0.22), transparent 60%),
     radial-gradient(50% 45% at 100% 10%, rgb(13 148 136 / 0.16), transparent 60%),
     radial-gradient(40% 35% at 80% 100%, rgb(99 102 241 / 0.14), transparent 65%);
 }
 
-/* Violet-to-teal gradient for Hermes reply bubbles */
-@utility hermes-reply-bubble {
-  background: linear-gradient(135deg, #3b1f7a 0%, #1e1a3e 60%, #0f2a3a 100%);
-}
+/* ─── Bubble styles — light: flat vintage cards; dark: rich gradients ─── */
+@layer utilities {
+  /* Hermes reply bubble — light: white card, violet left-border */
+  .hermes-bubble-hermes {
+    background: #ffffff;
+    color: #1c1917;
+    border-left: 3px solid #5b21b6;
+    box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.06);
+  }
+  /* Hermes reply bubble — dark: deep violet gradient */
+  .dark .hermes-bubble-hermes {
+    background: linear-gradient(135deg, #3b1f7a 0%, #1e1a3e 60%, #0f2a3a 100%) !important;
+    color: #e8e0ff !important;
+    border-left: none !important;
+    box-shadow: 0 4px 20px -2px rgb(124 58 237 / 0.4) !important;
+    outline: 1px solid rgb(255 255 255 / 0.08);
+    outline-offset: -1px;
+  }
 
-/* Teal gradient for user bubbles */
-@utility hermes-user-bubble {
-  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  /* User bubble — light: warm teal solid */
+  .hermes-bubble-user {
+    background: #0f766e;
+    color: #ffffff;
+    box-shadow: 0 1px 4px 0 rgb(13 148 136 / 0.3);
+  }
+  /* User bubble — dark: teal gradient */
+  .dark .hermes-bubble-user {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+    box-shadow: 0 4px 16px -2px rgb(13 148 136 / 0.35) !important;
+  }
+
+  /* User avatar — light: teal */
+  .hermes-avatar-user {
+    background: #0f766e;
+  }
+  /* User avatar — dark: brighter teal */
+  .dark .hermes-avatar-user {
+    background: #0d9488;
+  }
 }
