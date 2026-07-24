@@ -4,18 +4,17 @@ import { useEffect, useState } from "react"
 
 export type Theme = "dark" | "light"
 
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "dark"
+  const stored = localStorage.getItem("hermes-theme")
+  if (stored === "light" || stored === "dark") return stored
+  return "dark"
+}
+
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>("dark")
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
 
-  // Read persisted preference on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("hermes-theme") as Theme | null
-    if (stored === "light" || stored === "dark") {
-      setTheme(stored)
-    }
-  }, [])
-
-  // Apply .dark class to <html> whenever theme changes
+  // Apply .dark class synchronously whenever theme changes
   useEffect(() => {
     const root = document.documentElement
     if (theme === "dark") {

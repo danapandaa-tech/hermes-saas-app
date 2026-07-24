@@ -88,7 +88,7 @@ function MessageBubble({ message }: { message: Message }) {
         className={cn(
           "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
             isUser
-              ? "hermes-avatar-user text-white"
+              ? "hermes-avatar-user"
               : "bg-primary/15 text-primary ring-1 ring-primary/25",
         )}
         aria-hidden="true"

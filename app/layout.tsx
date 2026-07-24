@@ -57,6 +57,12 @@ export default function RootLayout({
       lang="en"
       className={`dark ${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable} bg-background`}
     >
+      {/* Blocking script: reads localStorage before first paint to avoid theme flash */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function(){var t=localStorage.getItem('hermes-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}})()`,
+        }}
+      />
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

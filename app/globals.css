@@ -191,9 +191,12 @@
   font-family: var(--font-heading);
 }
 
-/* Dark mode aurora — suppressed in light mode */
+/* Aurora — gentle artistic glows, mode-appropriate */
 @utility hermes-aurora {
-  background-image: none;
+  /* Light: warm gold top-left, pale teal top-right — very low opacity, just ambience */
+  background-image:
+    radial-gradient(55% 45% at 0% 0%, rgb(176 128 64 / 0.10), transparent 65%),
+    radial-gradient(45% 40% at 100% 0%, rgb(15 118 110 / 0.08), transparent 60%);
 }
 .dark .hermes-aurora,
 .dark.hermes-aurora {
@@ -222,24 +225,34 @@
     outline-offset: -1px;
   }
 
-  /* User bubble — light: warm teal solid */
+  /* User bubble — light: warm white card, teal right-border + teal shadow for distinction */
+  :root .hermes-bubble-user,
   .hermes-bubble-user {
-    background: #0f766e;
-    color: #ffffff;
-    box-shadow: 0 1px 4px 0 rgb(13 148 136 / 0.3);
+    background: #ffffff !important;
+    color: #1c1917 !important;
+    border-right: 3px solid #0f766e !important;
+    border-left: none !important;
+    box-shadow: 0 2px 8px -1px rgb(15 118 110 / 0.18), 0 1px 3px 0 rgb(0 0 0 / 0.05) !important;
   }
   /* User bubble — dark: teal gradient */
   .dark .hermes-bubble-user {
     background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+    color: #ffffff !important;
+    border-right: none !important;
     box-shadow: 0 4px 16px -2px rgb(13 148 136 / 0.35) !important;
   }
 
-  /* User avatar — light: teal */
+  /* User avatar — light: warm muted teal ring, parchment fill */
   .hermes-avatar-user {
-    background: #0f766e;
+    background: #ede7d9;
+    color: #0f766e;
+    outline: 1px solid rgb(15 118 110 / 0.35);
+    outline-offset: -1px;
   }
   /* User avatar — dark: brighter teal */
   .dark .hermes-avatar-user {
-    background: #0d9488;
+    background: #0d9488 !important;
+    color: #ffffff !important;
+    outline: none !important;
   }
 }
