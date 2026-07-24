@@ -191,23 +191,30 @@
   font-family: var(--font-heading);
 }
 
-/* Aurora — gentle artistic glows, mode-appropriate */
+/* Aurora — defined in @layer utilities for reliable specificity */
 @utility hermes-aurora {
-  /* Light: warm gold top-left, pale teal top-right — very low opacity, just ambience */
-  background-image:
-    radial-gradient(55% 45% at 0% 0%, rgb(176 128 64 / 0.10), transparent 65%),
-    radial-gradient(45% 40% at 100% 0%, rgb(15 118 110 / 0.08), transparent 60%);
-}
-.dark .hermes-aurora,
-.dark.hermes-aurora {
-  background-image:
-    radial-gradient(65% 50% at 10% 0%, rgb(124 58 237 / 0.22), transparent 60%),
-    radial-gradient(50% 45% at 100% 10%, rgb(13 148 136 / 0.16), transparent 60%),
-    radial-gradient(40% 35% at 80% 100%, rgb(99 102 241 / 0.14), transparent 65%);
+  /* fallback — overridden by the layer rules below */
+  background-image: none;
 }
 
-/* ─── Bubble styles — light: flat vintage cards; dark: rich gradients ─── */
+/* ─── Aurora + Avatar + Bubble styles ─── */
 @layer utilities {
+
+  /* Aurora — light: warm gold top-left, pale teal top-right, gentle artistic wash */
+  .hermes-aurora {
+    background-image:
+      radial-gradient(58% 48% at 0% 0%, rgb(176 128 64 / 0.13), transparent 62%),
+      radial-gradient(48% 42% at 100% 0%, rgb(15 118 110 / 0.10), transparent 58%);
+  }
+  /* Aurora — dark: vivid violet + teal + indigo */
+  .dark .hermes-aurora {
+    background-image:
+      radial-gradient(65% 50% at 10% 0%, rgb(124 58 237 / 0.22), transparent 60%),
+      radial-gradient(50% 45% at 100% 10%, rgb(13 148 136 / 0.16), transparent 60%),
+      radial-gradient(40% 35% at 80% 100%, rgb(99 102 241 / 0.14), transparent 65%) !important;
+  }
+
+/* ─── Bubble styles — light: flat vintage cards; dark: rich gradients ─── */
   /* Hermes reply bubble — light: white card, violet left-border */
   .hermes-bubble-hermes {
     background: #ffffff;
@@ -242,17 +249,14 @@
     box-shadow: 0 4px 16px -2px rgb(13 148 136 / 0.35) !important;
   }
 
-  /* User avatar — light: warm muted teal ring, parchment fill */
+  /* User avatar — light: warm stone, quiet and harmonious with parchment palette */
   .hermes-avatar-user {
-    background: #ede7d9;
-    color: #0f766e;
-    outline: 1px solid rgb(15 118 110 / 0.35);
-    outline-offset: -1px;
+    background: #d6cebc;
+    color: #44403c;
   }
-  /* User avatar — dark: brighter teal */
+  /* User avatar — dark: teal fill */
   .dark .hermes-avatar-user {
     background: #0d9488 !important;
     color: #ffffff !important;
-    outline: none !important;
   }
 }

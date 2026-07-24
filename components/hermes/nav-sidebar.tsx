@@ -89,7 +89,7 @@ export function NavSidebar() {
           onClick={() => setSwitcherOpen((o) => !o)}
           className="flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-sidebar-accent/60"
         >
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-white">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-full hermes-avatar-user text-sm font-semibold">
             AM
           </div>
           <div className="hidden min-w-0 flex-1 lg:block">
