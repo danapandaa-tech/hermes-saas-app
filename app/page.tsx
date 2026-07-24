@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { PanelRight, Sparkles, Sun, Moon } from "lucide-react"
 import { NavSidebar } from "@/components/hermes/nav-sidebar"
 import { ChatStream } from "@/components/hermes/chat-stream"
@@ -13,9 +13,14 @@ import { useTheme } from "@/lib/use-theme"
 export default function Page() {
   const [mode, setMode] = useState<ChatMode>("Chat")
   const [threadActive, setThreadActive] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const sendButtonRef = useRef<HTMLButtonElement>(null)
   const workflowRef = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleThreadDemo = () => {
     setThreadActive(true)
@@ -53,19 +58,21 @@ export default function Page() {
               <span className="hidden sm:block">Demo Thread</span>
             </button>
             {/* Discrete day/night toggle */}
-            <button
-              type="button"
-              onClick={toggle}
-              aria-label={theme === "dark" ? "Switch to day mode" : "Switch to night mode"}
-              title={theme === "dark" ? "Day mode" : "Night mode"}
-              className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              {theme === "dark" ? (
-                <Sun className="size-4" />
-              ) : (
-                <Moon className="size-4" />
-              )}
-            </button>
+            {mounted && (
+              <button
+                type="button"
+                onClick={toggle}
+                aria-label={theme === "dark" ? "Switch to day mode" : "Switch to night mode"}
+                title={theme === "dark" ? "Day mode" : "Night mode"}
+                className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                {theme === "dark" ? (
+                  <Sun className="size-4" />
+                ) : (
+                  <Moon className="size-4" />
+                )}
+              </button>
+            )}
             <button
               type="button"
               className="flex size-9 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:text-foreground xl:hidden"

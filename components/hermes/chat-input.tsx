@@ -13,14 +13,23 @@ const quickActions = [
 
 export function ChatInput() {
   const [value, setValue] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const messages = useChatStore((state) => state.messages)
+  const isLoading = useChatStore((state) => state.isLoading)
+  const error = useChatStore((state) => state.error)
   const addMessage = useChatStore((state) => state.addMessage)
+  const setIsLoading = useChatStore((state) => state.setIsLoading)
+  const setError = useChatStore((state) => state.setError)
+  const clearError = useChatStore((state) => state.clearError)
+
+  const handleQuickAction = (action: string) => {
+    setValue(action)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!value.trim() || isLoading) return
 
+    clearError()
     const userMessage = {
       id: Date.now().toString(),
       role: "user" as const,
@@ -42,6 +51,11 @@ export function ChatInput() {
           })),
         }),
       })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to get response")
+      }
 
       if (!response.body) throw new Error("No response body")
 
@@ -81,8 +95,9 @@ export function ChatInput() {
           }
         }
       }
-    } catch (error) {
-      console.error("Chat error:", error)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to send message"
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -90,6 +105,19 @@ export function ChatInput() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-6 sm:px-6">
+      {error && (
+        <div className="mb-3 flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          <div className="flex-1">{error}</div>
+          <button
+            type="button"
+            onClick={clearError}
+            className="text-destructive hover:text-destructive/80"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <div className="mb-3 flex flex-wrap gap-2.5">
         {quickActions.map((action) => {
           const Icon = action.icon
@@ -97,8 +125,9 @@ export function ChatInput() {
             <button
               key={action.label}
               type="button"
-              onClick={() => setValue((v) => (v ? v : action.label))}
-              className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/8 pl-3 pr-4 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-primary/15 hover:text-foreground"
+              onClick={() => handleQuickAction(action.label)}
+              disabled={isLoading}
+              className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/8 pl-3 pr-4 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-primary/15 hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Icon className="size-3 text-primary" />
               {action.label}

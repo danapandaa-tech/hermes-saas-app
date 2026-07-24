@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/lib/store"
 
@@ -19,9 +20,15 @@ function HermesMark({ className }: { className?: string }) {
 
 export function ChatStream() {
   const messages = useChatStore((state: any) => state.messages)
+  const isLoading = useChatStore((state: any) => state.isLoading)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, isLoading])
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 overflow-y-auto">
       <div className="flex flex-col items-center gap-3 pb-6 text-center">
         <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
           <HermesMark className="size-6 text-primary" />
@@ -37,14 +44,31 @@ export function ChatStream() {
         <div className="mt-2 h-px w-16 bg-primary/30" />
       </div>
 
-      {messages.map((message) => (
+      {messages.map((message: any) => (
         <MessageBubble key={message.id} message={message} />
       ))}
+
+      {isLoading && (
+        <div className="flex gap-3">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/25">
+            <HermesMark className="size-4 text-primary" />
+          </div>
+          <div className="flex max-w-[80%] flex-col gap-2 py-3">
+            <div className="space-y-2">
+              <div className="h-3 w-48 animate-pulse rounded-full bg-muted" />
+              <div className="h-3 w-40 animate-pulse rounded-full bg-muted" />
+              <div className="h-3 w-44 animate-pulse rounded-full bg-muted" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div ref={messagesEndRef} className="h-0 w-0" />
     </div>
   )
 }
 
-function MessageBubble({ message }: { message: any }) {
+function MessageBubble({ message }: { message: { id: string; role: string; content: string } }) {
   const isUser = message.role === "user"
   return (
     <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
