@@ -22,7 +22,7 @@ export function ModeToggle({
     <div
       role="tablist"
       aria-label="Workspace mode"
-      className="inline-flex items-center gap-1 rounded-xl border border-border bg-card/60 p-1"
+      className="inline-flex items-center gap-0"
     >
       {modes.map((mode) => {
         const Icon = mode.icon
@@ -35,14 +35,21 @@ export function ModeToggle({
             aria-selected={isActive}
             onClick={() => onChange(mode.label)}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+              "relative flex items-center gap-2 px-3.5 py-2 text-sm font-medium transition-colors",
               isActive
-                ? "bg-accent text-accent-foreground"
+                ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <Icon className="size-4" />
+            <Icon className={cn("size-4", isActive ? "text-accent" : "")} />
             <span className="hidden sm:block">{mode.label}</span>
+            {/* Underline indicator */}
+            {isActive && (
+              <span
+                className="absolute bottom-0 left-3.5 right-3.5 h-px bg-accent"
+                aria-hidden="true"
+              />
+            )}
           </button>
         )
       })}

@@ -126,10 +126,10 @@
   font-family: var(--font-heading);
 }
 
-/* atmospheric, constellation-like glow behind the workspace */
+/* atmospheric dusk glow — stronger, still not a wash */
 @utility hermes-aurora {
   background-image:
-    radial-gradient(60% 50% at 15% 0%, rgb(201 165 116 / 0.12), transparent 70%),
-    radial-gradient(50% 45% at 100% 20%, rgb(124 152 133 / 0.1), transparent 70%),
-    radial-gradient(40% 40% at 80% 100%, rgb(61 58 79 / 0.08), transparent 70%);
+    radial-gradient(70% 55% at 12% 0%, rgb(201 165 116 / 0.18), transparent 65%),
+    radial-gradient(55% 50% at 100% 15%, rgb(124 152 133 / 0.13), transparent 65%),
+    radial-gradient(45% 40% at 75% 100%, rgb(46 43 82 / 0.6), transparent 70%);
 }

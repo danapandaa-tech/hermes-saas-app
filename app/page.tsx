@@ -33,9 +33,9 @@ export default function Page() {
       <main className="hermes-aurora flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-border px-4 sm:px-6">
           <div className="min-w-0">
-            <p className="truncate font-heading text-base font-semibold text-foreground">{mode}</p>
-            <p className="hidden truncate text-xs text-muted-foreground sm:block">
-              Your AI operations companion
+            <p className="truncate text-sm font-medium text-foreground">{mode}</p>
+            <p className="hidden truncate font-mono text-[11px] text-muted-foreground/60 sm:block">
+              Lumen Rebrand · Solo Studio
             </p>
           </div>
           <div className="flex items-center gap-2">

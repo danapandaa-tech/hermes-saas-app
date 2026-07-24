@@ -15,7 +15,7 @@ export function ChatInput() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-6 sm:px-6">
-      <div className="mb-3 flex flex-wrap gap-2">
+      <div className="mb-3 flex flex-wrap gap-2.5">
         {quickActions.map((action) => {
           const Icon = action.icon
           return (
@@ -23,9 +23,9 @@ export function ChatInput() {
               key={action.label}
               type="button"
               onClick={() => setValue((v) => (v ? v : action.label))}
-              className="flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground"
+              className="flex items-center gap-2 border-l-2 border-accent/30 bg-card/40 pl-3 pr-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-accent/70 hover:bg-card/70 hover:text-foreground"
             >
-              <Icon className="size-3.5 text-accent" />
+              <Icon className="size-3 text-accent/70" />
               {action.label}
             </button>
           )
@@ -67,8 +67,8 @@ export function ChatInput() {
           <span className="sr-only">Send message</span>
         </button>
       </form>
-      <p className="mt-2 text-center text-xs text-muted-foreground">
-        Hermes can run automations in the background while you chat.
+      <p className="mt-2 text-center font-mono text-[11px] text-muted-foreground/60">
+        Hermes runs quietly in the background.
       </p>
     </div>
   )

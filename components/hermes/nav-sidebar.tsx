@@ -40,40 +40,28 @@ export function NavSidebar() {
         <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/12 ring-1 ring-accent/25">
           <HermesMark className="size-5 text-accent" />
         </div>
-        <span className="hidden font-heading text-lg font-semibold tracking-tight text-sidebar-foreground lg:block">
+        <span className="hidden font-heading text-xl font-medium tracking-wide text-sidebar-foreground lg:block">
           Hermes
         </span>
       </div>
 
       {/* Nav */}
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 py-4 lg:px-3">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = active === item.label
-          return (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => setActive(item.label)}
-              aria-current={isActive ? "page" : undefined}
-              className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                "justify-center lg:justify-start",
-                isActive
-                  ? "bg-sidebar-accent text-sidebar-foreground"
-                  : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
-              )}
-            >
-              <Icon
-                className={cn(
-                  "size-5 shrink-0 transition-colors",
-                  isActive ? "text-accent" : "text-muted-foreground group-hover:text-sidebar-foreground",
-                )}
-              />
-              <span className="hidden lg:block">{item.label}</span>
-            </button>
-          )
-        })}
+      <nav className="flex flex-1 flex-col overflow-y-auto px-2 py-4 lg:px-3">
+        {/* Primary section label — mono eyebrow */}
+        <p className="mb-1.5 hidden px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50 lg:block">
+          Workspace
+        </p>
+        {navItems.slice(0, 5).map((item) => (
+          <NavItem key={item.label} item={item} isActive={active === item.label} onClick={() => setActive(item.label)} />
+        ))}
+        {/* Divider before utility items */}
+        <div className="my-3 mx-3 hidden border-t border-sidebar-border lg:block" />
+        <p className="mb-1.5 hidden px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50 lg:block">
+          Library
+        </p>
+        {navItems.slice(5).map((item) => (
+          <NavItem key={item.label} item={item} isActive={active === item.label} onClick={() => setActive(item.label)} />
+        ))}
       </nav>
 
       {/* Workspace switcher + avatar */}
@@ -115,16 +103,53 @@ export function NavSidebar() {
   )
 }
 
+function NavItem({
+  item,
+  isActive,
+  onClick,
+}: {
+  item: { label: string; icon: React.ComponentType<{ className?: string }> }
+  isActive: boolean
+  onClick: () => void
+}) {
+  const Icon = item.icon
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-current={isActive ? "page" : undefined}
+      className={cn(
+        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        "justify-center lg:justify-start",
+        isActive
+          ? "bg-sidebar-accent text-sidebar-foreground"
+          : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+      )}
+    >
+      <Icon
+        className={cn(
+          "size-4 shrink-0 transition-colors",
+          isActive ? "text-accent" : "text-muted-foreground group-hover:text-sidebar-foreground",
+        )}
+      />
+      <span className="hidden lg:block">{item.label}</span>
+    </button>
+  )
+}
+
 function HermesMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path
-        d="M12 2v20M5 6l14 12M19 6L5 18"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <circle cx="12" cy="12" r="2.4" fill="currentColor" />
+      {/* Caduceus: central staff */}
+      <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Top wings — horizontal bar */}
+      <path d="M8.5 5.5 Q12 3.5 15.5 5.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+      {/* Serpent left */}
+      <path d="M12 7 Q8 9 10 12 Q7 15 12 17" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+      {/* Serpent right */}
+      <path d="M12 7 Q16 9 14 12 Q17 15 12 17" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+      {/* Knot circle at center */}
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
     </svg>
   )
 }

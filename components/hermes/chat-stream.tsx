@@ -1,5 +1,17 @@
 import { cn } from "@/lib/utils"
 
+function HermesMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M8.5 5.5 Q12 3.5 15.5 5.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+      <path d="M12 7 Q8 9 10 12 Q7 15 12 17" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+      <path d="M12 7 Q16 9 14 12 Q17 15 12 17" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+    </svg>
+  )
+}
+
 type Message = {
   id: number
   role: "user" | "hermes"
@@ -46,16 +58,19 @@ const messages: Message[] = [
 export function ChatStream() {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6">
-      <div className="flex flex-col items-center gap-2 pb-2 text-center">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-accent/12 ring-1 ring-accent/25">
-          <span className="font-heading text-lg font-semibold text-accent">H</span>
+      <div className="flex flex-col items-center gap-3 pb-6 text-center">
+        <div className="flex size-11 items-center justify-center rounded-2xl bg-accent/10 ring-1 ring-accent/20">
+          <HermesMark className="size-6 text-accent" />
         </div>
-        <h1 className="font-heading text-balance text-xl font-semibold text-foreground">
+        {/* Fraunces only here: the session title is the one display moment */}
+        <h1 className="font-heading text-balance text-2xl font-medium tracking-tight text-foreground">
           Lumen Rebrand
         </h1>
-        <p className="text-pretty text-sm text-muted-foreground">
-          A calm space to think out loud. Hermes keeps your context, memory, and workflows in sync.
+        <p className="max-w-sm text-pretty text-sm leading-relaxed text-muted-foreground">
+          A calm space to think. Hermes carries your context, tasks, and workflows so you don&apos;t have to.
         </p>
+        {/* Hairline rule beneath the header block */}
+        <div className="mt-2 h-px w-16 bg-accent/20" />
       </div>
 
       {messages.map((message) => (
@@ -73,12 +88,16 @@ function MessageBubble({ message }: { message: Message }) {
         className={cn(
           "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
           isUser
-            ? "bg-secondary text-secondary-foreground"
-            : "bg-accent/12 text-accent ring-1 ring-accent/25",
+            ? "bg-secondary/80 text-secondary-foreground"
+            : "bg-accent/10 text-accent ring-1 ring-accent/20",
         )}
         aria-hidden="true"
       >
-        {isUser ? "AM" : "H"}
+        {isUser ? (
+          <span>AM</span>
+        ) : (
+          <HermesMark className="size-4 text-accent" />
+        )}
       </div>
       <div className={cn("flex max-w-[80%] flex-col gap-1", isUser ? "items-end" : "items-start")}>
         <div
@@ -91,7 +110,7 @@ function MessageBubble({ message }: { message: Message }) {
         >
           {message.content}
         </div>
-        <span className="px-1 text-xs text-muted-foreground">{message.time}</span>
+        <span className="px-1 font-mono text-[11px] text-muted-foreground/70">{message.time}</span>
       </div>
     </div>
   )

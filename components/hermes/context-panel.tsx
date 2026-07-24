@@ -20,16 +20,16 @@ export function ContextPanel() {
       <Section icon={FolderKanban} title="Project context">
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <p className="font-medium text-card-foreground">Lumen Rebrand</p>
-            <span className="rounded-full bg-accent/12 px-2 py-0.5 text-xs font-medium text-accent">
+            <p className="text-sm font-medium text-card-foreground">Lumen Rebrand</p>
+            <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-accent/80">
               Active
             </span>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Brand identity · Due in 9 days</p>
-          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-            <div className="h-full w-2/5 rounded-full bg-accent" />
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground/70">Brand identity · Due in 9 days</p>
+          <div className="mt-3 h-px w-full overflow-hidden bg-border">
+            <div className="h-full w-2/5 bg-accent/60" />
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">3 of 8 tasks complete</p>
+          <p className="mt-2 font-mono text-[11px] text-muted-foreground/70">3 of 8 tasks complete</p>
         </div>
       </Section>
 
@@ -39,7 +39,7 @@ export function ContextPanel() {
           {memorySnippets.map((snippet) => (
             <li
               key={snippet}
-              className="rounded-lg border border-border bg-card/60 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground"
+              className="border-l-2 border-accent/20 bg-card/30 pl-3 pr-2 py-2 text-xs leading-relaxed text-muted-foreground hover:border-accent/50 hover:text-foreground/80 transition-colors cursor-default"
             >
               {snippet}
             </li>
@@ -62,7 +62,7 @@ export function ContextPanel() {
               )}
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-card-foreground">{wf.name}</p>
-                <p className="truncate text-xs text-muted-foreground">{wf.detail}</p>
+                <p className="truncate font-mono text-[11px] text-muted-foreground/80">{wf.detail}</p>
               </div>
             </li>
           ))}
@@ -84,8 +84,8 @@ function Section({
   return (
     <section className={cn("mb-7")}>
       <div className="mb-3 flex items-center gap-2">
-        <Icon className="size-4 text-accent" />
-        <h2 className="font-heading text-sm font-semibold text-foreground">{title}</h2>
+        <Icon className="size-3.5 text-accent/70" />
+        <h2 className="font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{title}</h2>
       </div>
       {children}
     </section>
