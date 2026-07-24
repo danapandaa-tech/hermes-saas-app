@@ -1,5 +1,5 @@
 import type Stripe from 'stripe'
-import { getStripe } from '@/lib/billing/stripe'
+import { requireStripe } from '@/lib/billing/stripe'
 import {
   syncCheckoutCustomer,
   upsertSubscriptionFromStripe,
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
   let event: Stripe.Event
   try {
-    event = getStripe().webhooks.constructEvent(
+    event = requireStripe().webhooks.constructEvent(
       await request.text(),
       signature,
       webhookSecret,

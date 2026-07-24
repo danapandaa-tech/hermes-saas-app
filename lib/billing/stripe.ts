@@ -9,10 +9,16 @@ export const PAID_PLAN = {
   interval: 'month' as const,
 }
 
-export function getStripe() {
+export function getStripe(): Stripe | null {
   const secretKey = process.env.STRIPE_SECRET_KEY
-  if (!secretKey) throw new Error('STRIPE_SECRET_KEY is not configured')
+  if (!secretKey) return null
   return new Stripe(secretKey)
+}
+
+export function requireStripe(): Stripe {
+  const s = getStripe()
+  if (!s) throw new Error('STRIPE_SECRET_KEY is not configured')
+  return s
 }
 
 export function getAppUrl() {

@@ -1,12 +1,12 @@
 import 'server-only'
-import { getAppUrl, getStripe, PAID_PLAN } from './stripe'
+import { getAppUrl, requireStripe, PAID_PLAN } from './stripe'
 import { getSubscription } from './subscriptions'
 
 export async function createSubscriptionCheckout(input: {
   userId: string
   email: string
 }) {
-  const stripe = getStripe()
+  const stripe = requireStripe()
   const appUrl = getAppUrl()
   const existing = await getSubscription(input.userId)
 
@@ -45,7 +45,7 @@ export async function createBillingPortal(userId: string) {
     throw new Error('No Stripe customer exists for this account')
   }
 
-  const session = await getStripe().billingPortal.sessions.create({
+  const session = requireStripe().billingPortal.sessions.create({
     customer: subscription.stripeCustomerId,
     return_url: `${getAppUrl()}/`,
   })
