@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Mono, Inter, Fraunces } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 
 const inter = Inter({ variable: '--font-inter', subsets: ['latin'] })
@@ -41,15 +42,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`dark ${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable} bg-background`}
     >
-      <head>
-        {/* Reads the saved theme before first paint to avoid a color flash. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('hermes-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}})()`,
-          }}
-        />
-      </head>
       <body className="font-sans antialiased">
+        <Script id="hermes-theme" strategy="beforeInteractive">
+          {`(function(){var t=localStorage.getItem('hermes-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}})()`}
+        </Script>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
