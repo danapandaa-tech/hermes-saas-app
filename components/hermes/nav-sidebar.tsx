@@ -72,79 +72,79 @@ export function NavSidebar() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         )}
       >
-      {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-4">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/20 ring-1 ring-primary/35">
-          <HermesMark className="size-5 text-primary" />
+        {/* Logo */}
+        <div className="flex h-16 items-center gap-3 px-4">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/20 ring-1 ring-primary/35">
+            <HermesMark className="size-5 text-primary" />
+          </div>
+          <span className="font-heading text-xl font-medium tracking-wide text-sidebar-foreground">Hermes</span>
         </div>
-        <span className="font-heading text-xl font-medium tracking-wide text-sidebar-foreground">Hermes</span>
-      </div>
 
-      {/* Nav */}
-      <nav className="flex flex-1 flex-col overflow-y-auto px-2 py-4">
-        {/* Primary section label — mono eyebrow */}
-        <p className="mb-1.5 px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50">
-          Workspace
-        </p>
-        {navItems.slice(0, 5).map((item) => (
-          <NavItem
-            key={item.label}
-            item={item}
-            isActive={activeView === item.view}
-            onClick={() => setActiveView(item.view)}
-          />
-        ))}
-        {/* Divider before utility items */}
-        <div className="my-3 mx-3 border-t border-sidebar-border" />
-        <p className="mb-1.5 px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50">
-          Library
-        </p>
-        {navItems.slice(5).map((item) => (
-          <NavItem
-            key={item.label}
-            item={item}
-            isActive={activeView === item.view}
-            onClick={() => setActiveView(item.view)}
-          />
-        ))}
-      </nav>
+        {/* Nav */}
+        <nav className="flex flex-1 flex-col overflow-y-auto px-2 py-4">
+          {/* Primary section label — mono eyebrow */}
+          <p className="mb-1.5 px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50">
+            Workspace
+          </p>
+          {navItems.slice(0, 5).map((item) => (
+            <NavItem
+              key={item.label}
+              item={item}
+              isActive={activeView === item.view}
+              onClick={() => setActiveView(item.view)}
+            />
+          ))}
+          {/* Divider before utility items */}
+          <div className="my-3 mx-3 border-t border-sidebar-border" />
+          <p className="mb-1.5 px-3 font-mono text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50">
+            Library
+          </p>
+          {navItems.slice(5).map((item) => (
+            <NavItem
+              key={item.label}
+              item={item}
+              isActive={activeView === item.view}
+              onClick={() => setActiveView(item.view)}
+            />
+          ))}
+        </nav>
 
-      {/* Workspace switcher + avatar */}
-      <div className="relative border-t border-sidebar-border p-3">
-        {switcherOpen && (
-          <div className="absolute bottom-full left-3 right-3 mb-2 overflow-hidden rounded-xl border border-sidebar-border bg-popover p-1 shadow-xl">
-            {workspaces.map((ws) => (
-              <button
-                key={ws}
-                type="button"
-                onClick={() => {
-                  setWorkspace(ws)
-                  setSwitcherOpen(false)
-                }}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-popover-foreground hover:bg-sidebar-accent"
-              >
-                {ws}
-                {workspace === ws && <Check className="size-4 text-primary" />}
-              </button>
-            ))}
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={() => setSwitcherOpen((o) => !o)}
-          className="flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-sidebar-accent/60"
-        >
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full hermes-avatar-user text-sm font-semibold">
-            {userInitials}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">{userId}</p>
-            <p className="truncate text-xs text-muted-foreground">{workspace}</p>
-          </div>
-          <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
-        </button>
-      </div>
-    </aside>
+        {/* Workspace switcher + avatar */}
+        <div className="relative border-t border-sidebar-border p-3">
+          {switcherOpen && (
+            <div className="absolute bottom-full left-3 right-3 mb-2 overflow-hidden rounded-xl border border-sidebar-border bg-popover p-1 shadow-xl">
+              {workspaces.map((ws) => (
+                <button
+                  key={ws}
+                  type="button"
+                  onClick={() => {
+                    setWorkspace(ws)
+                    setSwitcherOpen(false)
+                  }}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-popover-foreground hover:bg-sidebar-accent"
+                >
+                  {ws}
+                  {workspace === ws && <Check className="size-4 text-primary" />}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setSwitcherOpen((o) => !o)}
+            className="flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-sidebar-accent/60"
+          >
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-full hermes-avatar-user text-sm font-semibold">
+              {userInitials}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-sidebar-foreground">{userId}</p>
+              <p className="truncate text-xs text-muted-foreground">{workspace}</p>
+            </div>
+            <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
+          </button>
+        </div>
+      </aside>
     </>
   )
 }
