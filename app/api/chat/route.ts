@@ -52,11 +52,21 @@ Supported shortcuts:
 
 Help users think clearly and stay organized.`
 
-  const result = streamText({
-    model: deepseek('deepseek/deepseek-chat'),
-    messages,
-    system: systemPrompt,
-  })
+  try {
+    const result = streamText({
+      model: deepseek('deepseek-chat'),
+      messages,
+      system: systemPrompt,
+    })
 
-  return result.toTextStreamResponse()
+    return result.toTextStreamResponse()
+  } catch (error) {
+    console.error('[v0] Chat API error:', error)
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get AI response. Please try again.',
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
+  }
 }

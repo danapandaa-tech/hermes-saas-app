@@ -1,12 +1,11 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { PanelRight, Sparkles, Sun, Moon, X } from "lucide-react"
+import { PanelRight, Sun, Moon, X } from "lucide-react"
 import { NavSidebar } from "@/components/hermes/nav-sidebar"
 import { ChatStream } from "@/components/hermes/chat-stream"
 import { ChatInput } from "@/components/hermes/chat-input"
 import { ContextPanel } from "@/components/hermes/context-panel"
-import { ModeToggle, type ChatMode } from "@/components/hermes/mode-toggle"
 import { ThreadAnimation } from "@/components/hermes/thread-animation"
 import { useTheme } from "@/lib/use-theme"
 import { useViewStore } from "@/lib/view-store"
@@ -19,14 +18,11 @@ import { IntegrationsView } from "@/components/hermes/views/integrations-view"
 import { SettingsView } from "@/components/hermes/views/settings-view"
 
 export default function Page() {
-  const [mode, setMode] = useState<ChatMode>("Chat")
   const [threadActive, setThreadActive] = useState(false)
   const [contextOpen, setContextOpen] = useState(true)
-  const sendButtonRef = useRef<HTMLButtonElement>(null)
   const workflowRef = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
   const activeView = useViewStore((state) => state.activeView)
-  const closeSidebar = useViewStore((state) => state.closeSidebar)
 
   const handleThreadDemo = () => {
     setThreadActive(true)
@@ -83,19 +79,14 @@ export default function Page() {
           </div>
           <div className="flex items-center gap-2">
             {isChatView && (
-              <>
-                <ModeToggle value={mode} onChange={setMode} />
-                <button
-                  ref={sendButtonRef}
-                  type="button"
-                  onClick={handleThreadDemo}
-                  className="hidden sm:flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
-                  title="Demo: See The Thread animation when a task is created"
-                >
-                  <Sparkles className="size-3.5" />
-                  <span>Demo Thread</span>
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={handleThreadDemo}
+                className="hidden sm:flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                title="Demo: See The Thread animation when a task is created"
+              >
+                <span>✨ Demo</span>
+              </button>
             )}
             {/* Discrete day/night toggle */}
             <button
