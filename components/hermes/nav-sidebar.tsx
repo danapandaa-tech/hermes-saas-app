@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useViewStore, type ViewType } from "@/lib/view-store"
+import { useAuth } from "@/lib/use-auth"
 
 const navItems: Array<{ label: string; icon: React.ComponentType<{ className?: string }>; view: ViewType }> = [
   { label: "Chat", icon: MessageSquare, view: "chat" },
@@ -32,12 +33,16 @@ const navItems: Array<{ label: string; icon: React.ComponentType<{ className?: s
 const workspaces = ["Solo Studio", "Client Work", "Personal"]
 
 export function NavSidebar() {
+  const { userId } = useAuth()
   const activeView = useViewStore((state) => state.activeView)
   const setActiveView = useViewStore((state) => state.setActiveView)
   const sidebarOpen = useViewStore((state) => state.sidebarOpen)
   const toggleSidebar = useViewStore((state) => state.toggleSidebar)
   const [switcherOpen, setSwitcherOpen] = useState(false)
   const [workspace, setWorkspace] = useState(workspaces[0])
+  
+  // Get user display info
+  const userInitials = userId.slice(-2).toUpperCase()
 
   return (
     <>
@@ -130,10 +135,10 @@ export function NavSidebar() {
           className="flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-sidebar-accent/60"
         >
           <div className="flex size-9 shrink-0 items-center justify-center rounded-full hermes-avatar-user text-sm font-semibold">
-            AM
+            {userInitials}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">Ada Maro</p>
+            <p className="truncate text-sm font-medium text-sidebar-foreground">{userId}</p>
             <p className="truncate text-xs text-muted-foreground">{workspace}</p>
           </div>
           <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />

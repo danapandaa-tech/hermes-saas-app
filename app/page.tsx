@@ -59,11 +59,13 @@ export default function Page() {
 
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-background">
-      <ThreadAnimation
-        isActive={threadActive}
-        fromElement={sendButtonRef.current}
-        toElement={workflowRef.current}
-      />
+      {threadActive && (
+        <ThreadAnimation
+          isActive={threadActive}
+          fromElement={null}
+          toElement={workflowRef.current}
+        />
+      )}
       <NavSidebar />
 
       {/* Main workspace */}
