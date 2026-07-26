@@ -2,15 +2,27 @@ import { streamText } from 'ai'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { saveMessage } from '@/lib/messages'
 
-const deepseek = createOpenAICompatible({
-  name: 'openrouter',
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
-})
+function createProvider() {
+  return createOpenAICompatible({
+    name: 'openrouter',
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: process.env.OPENROUTER_API_KEY!,
+    headers: {
+      'HTTP-Referer': 'https://hermes-saas-app.vercel.app',
+      'X-Title': 'Hermes Operations Companion',
+    },
+  })
+}
+
+// Fallback chain: paid DeepSeek → free Gemma → free GPT-OSS → free Nemotron
+const MODEL_CHAIN = [
+  'deepseek/deepseek-chat',
+  'google/gemma-4-26b-a4b-it:free',
+  'openai/gpt-oss-20b:free',
+  'nvidia/nemotron-nano-9b-v2:free',
+]
 
 export async function POST(request: Request) {
-  const { messages } = await request.json()
-
   if (!process.env.OPENROUTER_API_KEY) {
     return new Response(
       JSON.stringify({
@@ -20,53 +32,54 @@ export async function POST(request: Request) {
     )
   }
 
+  const { messages } = await request.json()
   const userMessage = messages[messages.length - 1]?.content || ''
 
   if (userMessage) {
-    await saveMessage('user', userMessage)
+    try { await saveMessage('user', userMessage) } catch {}
   }
 
-  // Build enhanced system prompt with context awareness
-  // This acknowledges projects, tasks, and previous decisions
-  const systemPrompt = `You are Hermes, a calm and focused AI assistant designed to help users manage their projects and tasks.
+  const systemPrompt = `You are Hermes, a calm and focused AI operations companion for neurodivergent solopreneurs and creatives.
 
-You provide thoughtful, concise guidance without overwhelming the user. You are context-aware and understand:
-- Active projects and their status
-- Upcoming tasks and deadlines  
-- Previous decisions and insights (saved in memory)
-- Work automation workflows
+Your role:
+- Help manage projects, tasks, and workflows without overwhelming the user
+- Remember context across conversations
+- Suggest memory-saving for important insights with a lightbulb emoji
+- Be proactive about task scheduling and workflow suggestions
+- Keep responses concise but complete — no walls of text
+- Ask clarifying questions before taking action
 
-Always:
-1. Reference context when relevant (e.g., "I see you're working on the Lumen project...")
-2. Suggest memory-saving for important insights with 💡
-3. Be proactive about task scheduling and workflow suggestions
-4. Keep responses concise but complete
-5. Ask clarifying questions if needed before taking action
+Supported commands (handled client-side, just acknowledge):
+- /create project [name]
+- /create task [title]
+- /list projects
+- /list tasks
 
-Supported shortcuts:
-- /create project [name] - Create a new project
-- /create task [title] - Create a task
-- /list projects - Show active projects
-- /list tasks - Show all tasks
-- /schedule [action] [time] - Schedule a task or reminder
+Tone: Calm, supportive, never urgent. Short paragraphs, bullet points, scannable.
+You are the calm in their chaos.`
 
-Help users think clearly and stay organized.`
+  const provider = createProvider()
 
-  try {
-    const result = streamText({
-      model: deepseek('deepseek-chat'),
-      messages,
-      system: systemPrompt,
-    })
+  // Try each model in the fallback chain
+  for (const model of MODEL_CHAIN) {
+    try {
+      const result = streamText({
+        model: provider(model),
+        messages,
+        system: systemPrompt,
+        max_tokens: 1000,
+      })
 
-    return result.toTextStreamResponse()
-  } catch (error) {
-    console.error('[v0] Chat API error:', error)
-    return new Response(
-      JSON.stringify({
-        error: 'Failed to get AI response. Please try again.',
-      }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    )
+      return result.toTextStreamResponse()
+    } catch (err) {
+      console.error(`Model ${model} failed:`, err)
+      continue
+    }
   }
+
+  // All models failed
+  return new Response(
+    JSON.stringify({ error: 'All AI models are unavailable. Please try again later.' }),
+    { status: 503, headers: { 'Content-Type': 'application/json' } }
+  )
 }
