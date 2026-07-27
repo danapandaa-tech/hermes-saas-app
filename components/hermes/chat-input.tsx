@@ -82,6 +82,15 @@ export function ChatInput() {
     return false
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Submit on Enter, but allow Shift+Enter for multiline
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault()
+      const form = e.currentTarget.closest("form")
+      form?.dispatchEvent(new Event("submit", { bubbles: true }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!value.trim() || isLoading) return
@@ -107,6 +116,8 @@ export function ChatInput() {
     setIsLoading(true)
 
     try {
+      console.log("[v0] Sending message to Eve agent:", trimmedValue)
+      
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -118,9 +129,12 @@ export function ChatInput() {
         }),
       })
 
+      console.log("[v0] Eve agent response status:", response.status, response.statusText)
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to get response")
+        const errorText = await response.text()
+        console.error("[v0] Eve agent error response:", errorText)
+        throw new Error(errorText || "Failed to get response")
       }
 
       if (!response.body) throw new Error("No response body")
@@ -215,6 +229,7 @@ export function ChatInput() {
         <textarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          onKeyDown={handleKeyDown}
           rows={1}
           placeholder="Message Hermes…"
           className="max-h-40 min-h-9 flex-1 resize-none bg-transparent py-1.5 text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
