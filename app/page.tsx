@@ -1,11 +1,14 @@
 "use client"
 
 import { useState, useRef } from "react"
+import dynamic from "next/dynamic"
 import { PanelRight, Sun, Moon, X } from "lucide-react"
 import { NavSidebar } from "@/components/hermes/nav-sidebar"
-import { ChatStream } from "@/components/hermes/chat-stream"
-import { ChatInput } from "@/components/hermes/chat-input"
 import { ContextPanel } from "@/components/hermes/context-panel"
+
+// Never SSR the chat components — they depend on browser APIs (ReadableStream, localStorage)
+const ChatStream = dynamic(() => import("@/components/hermes/chat-stream").then((m) => m.ChatStream), { ssr: false })
+const ChatInput = dynamic(() => import("@/components/hermes/chat-input").then((m) => m.ChatInput), { ssr: false })
 import { ThreadAnimation } from "@/components/hermes/thread-animation"
 import { useTheme } from "@/lib/use-theme"
 import { useViewStore } from "@/lib/view-store"

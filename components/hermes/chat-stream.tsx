@@ -2,7 +2,10 @@
 
 import { useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
-import { useChatStore } from "@/lib/store"
+import { useChat } from "@ai-sdk/react"
+import { getHermesChat } from "@/lib/chat-instance"
+import { useMemoryStore } from "@/lib/memory-store"
+import { useProjectStore } from "@/lib/project-store"
 
 function HermesMark({ className }: { className?: string }) {
   return (
@@ -16,11 +19,10 @@ function HermesMark({ className }: { className?: string }) {
   )
 }
 
-
-
 export function ChatStream() {
-  const messages = useChatStore((state: any) => state.messages)
-  const isLoading = useChatStore((state: any) => state.isLoading)
+  const { messages, status } = useChat({ chat: getHermesChat() })
+  const isLoading = status === "streaming" || status === "submitted"
+  // status values in AI SDK v7: 'ready' | 'submitted' | 'streaming' | 'error'
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -33,18 +35,22 @@ export function ChatStream() {
         <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
           <HermesMark className="size-6 text-primary" />
         </div>
-        {/* Fraunces only here: the session title is the one display moment */}
         <h1 className="font-heading text-balance text-2xl font-medium tracking-tight text-foreground">
-          Lumen Rebrand
+          Good to see you
         </h1>
         <p className="max-w-sm text-pretty text-sm leading-relaxed text-muted-foreground">
           A calm space to think. Hermes carries your context, tasks, and workflows so you don&apos;t have to.
         </p>
-        {/* Hairline rule beneath the header block */}
         <div className="mt-2 h-px w-16 bg-primary/30" />
       </div>
 
-      {messages.map((message: any) => (
+      {messages.length === 0 && (
+        <p className="text-center text-sm text-muted-foreground">
+          Send a message to start talking with Hermes.
+        </p>
+      )}
+
+      {messages.map((message) => (
         <MessageBubble key={message.id} message={message} />
       ))}
 
@@ -68,29 +74,42 @@ export function ChatStream() {
   )
 }
 
-function MessageBubble({ message }: { message: { id: string; role: string; content: string } }) {
-  const { useMemoryStore } = require("@/lib/memory-store")
-  const { useProjectStore } = require("@/lib/project-store")
-  const addMemory = useMemoryStore((state: any) => state.addMemory)
-  const selectedProjectId = useProjectStore((state: any) => state.selectedProjectId)
-  
+type ChatMessage = {
+  id: string
+  role: string
+  parts?: Array<{ type: string; text?: string }>
+  content?: string
+}
+
+function getTextContent(message: ChatMessage): string {
+  if (message.parts && message.parts.length > 0) {
+    return message.parts
+      .filter((p) => p.type === "text")
+      .map((p) => p.text ?? "")
+      .join("")
+  }
+  return message.content ?? ""
+}
+
+function MessageBubble({ message }: { message: ChatMessage }) {
+  const addMemory = useMemoryStore((state) => state.addMemory)
+  const selectedProjectId = useProjectStore((state) => state.selectedProjectId)
   const isUser = message.role === "user"
-  
+  const textContent = getTextContent(message)
+
   const handleSaveToMemory = () => {
-    const { getCurrentUserId } = require("@/lib/auth-context")
-    const userId = getCurrentUserId()
-    const memory = {
+    addMemory({
       id: `mem_${Date.now()}`,
-      userId,
-      projectId: selectedProjectId,
-      type: isUser ? "decision" as const : ("insight" as const),
-      title: message.content.slice(0, 50) + (message.content.length > 50 ? "..." : ""),
-      content: message.content,
+      userId: "user",
+      projectId: selectedProjectId ?? undefined,
+      type: isUser ? "decision" : "insight",
+      title: textContent.slice(0, 60) + (textContent.length > 60 ? "..." : ""),
+      content: textContent,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
-    addMemory(memory)
+    })
   }
+
   return (
     <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
       <div
@@ -100,7 +119,7 @@ function MessageBubble({ message }: { message: { id: string; role: string; conte
         )}
         aria-hidden="true"
       >
-        {isUser ? <span className="font-medium">AM</span> : <HermesMark className="size-4 text-primary" />}
+        {isUser ? <span className="font-medium">U</span> : <HermesMark className="size-4 text-primary" />}
       </div>
       <div className={cn("group/msg flex max-w-[80%] flex-col gap-1", isUser ? "items-end" : "items-start")}>
         <div
@@ -111,13 +130,12 @@ function MessageBubble({ message }: { message: { id: string; role: string; conte
               : "hermes-bubble-hermes rounded-tl-sm shadow-md",
           )}
         >
-          {message.content}
+          {textContent}
         </div>
         {!isUser && (
           <button
             onClick={handleSaveToMemory}
             className="text-xs text-muted-foreground opacity-0 transition-opacity group-hover/msg:opacity-100 hover:text-foreground"
-            title="Save this message to memory"
           >
             Save to memory
           </button>

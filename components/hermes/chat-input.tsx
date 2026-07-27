@@ -1,200 +1,51 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Paperclip, ArrowUp, Sparkles, ListChecks, FileText, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useChatStore } from "@/lib/store"
-import { useProjectStore } from "@/lib/project-store"
-import { useTaskStore } from "@/lib/task-store"
-import { useMemoryStore } from "@/lib/memory-store"
-import { useAuth } from "@/lib/use-auth"
+import { useChat } from "@ai-sdk/react"
+import { getHermesChat } from "@/lib/chat-instance"
 
 const quickActions = [
-  { label: "Summarize project", icon: Sparkles },
-  { label: "Create tasks", icon: ListChecks },
-  { label: "Draft a note", icon: FileText },
-  { label: "Review my projects", icon: Zap },
+  { label: "Summarize my current project status", icon: Sparkles },
+  { label: "Help me create tasks for my project", icon: ListChecks },
+  { label: "Draft a short progress note", icon: FileText },
+  { label: "What should I focus on today?", icon: Zap },
 ]
 
 export function ChatInput() {
-  const [value, setValue] = useState("")
-  const messages = useChatStore((state) => state.messages)
-  const isLoading = useChatStore((state) => state.isLoading)
-  const error = useChatStore((state) => state.error)
-  const addMessage = useChatStore((state) => state.addMessage)
-  const setIsLoading = useChatStore((state) => state.setIsLoading)
-  const setError = useChatStore((state) => state.setError)
-  const clearError = useChatStore((state) => state.clearError)
-  
-  const { userId } = useAuth()
-  const projects = useProjectStore((state) => state.projects)
-  const addProject = useProjectStore((state) => state.addProject)
-  const tasks = useTaskStore((state) => state.tasks)
-  const addTask = useTaskStore((state) => state.addTask)
+  const [input, setInput] = useState("")
+  const formRef = useRef<HTMLFormElement>(null)
 
-  const handleQuickAction = (action: string) => {
-    setValue(action)
-  }
-  
-  const handleCommand = (command: string) => {
-    if (command.startsWith('/create project ')) {
-      const name = command.replace('/create project ', '')
-      if (name.trim()) {
-        const project = {
-          id: `proj_${Date.now()}`,
-          userId,
-          name: name.trim(),
-          description: '',
-          status: 'active' as const,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }
-        addProject(project)
-        setValue('')
-        setError(null)
-        // Show confirmation
-        const msg = { id: Date.now().toString(), role: 'assistant' as const, content: `✓ Created project "${name}"` }
-        addMessage(msg)
-        return true
-      }
-    } else if (command.startsWith('/create task ')) {
-      const title = command.replace('/create task ', '')
-      if (title.trim() && projects.length > 0) {
-        const task = {
-          id: `task_${Date.now()}`,
-          projectId: projects[0].id,
-          userId,
-          title: title.trim(),
-          description: undefined,
-          status: 'todo' as const,
-          priority: 'medium' as const,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }
-        addTask(task)
-        setValue('')
-        setError(null)
-        const msg = { id: Date.now().toString(), role: 'assistant' as const, content: `✓ Created task "${title}" in ${projects[0].name}` }
-        addMessage(msg)
-        return true
-      }
-    }
-    return false
+  // AI SDK v7: useChat returns sendMessage, status, error — no input/handleSubmit
+  const { sendMessage, status, error } = useChat({ chat: getHermesChat() })
+
+  const isLoading = status === "streaming" || status === "submitted"
+
+  const submit = () => {
+    const text = input.trim()
+    if (!text || isLoading) return
+    setInput("")
+    sendMessage({ text })
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Submit on Enter, but allow Shift+Enter for multiline
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault()
-      const form = e.currentTarget.closest("form")
-      form?.dispatchEvent(new Event("submit", { bubbles: true }))
+      submit()
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!value.trim() || isLoading) return
-
-    clearError()
-    const trimmedValue = value.trim()
-    
-    // Check if it's a command
-    if (trimmedValue.startsWith('/')) {
-      if (handleCommand(trimmedValue)) {
-        return
-      }
-    }
-    
-    const userMessage = {
-      id: Date.now().toString(),
-      role: "user" as const,
-      content: trimmedValue,
-    }
-
-    addMessage(userMessage)
-    setValue("")
-    setIsLoading(true)
-
-    try {
-      console.log("[v0] Sending message to Eve agent:", trimmedValue)
-      
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map((m) => ({
-            role: m.role === "user" ? "user" : "assistant",
-            content: m.content,
-          })),
-        }),
-      })
-
-      console.log("[v0] Eve agent response status:", response.status, response.statusText)
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error("[v0] Eve agent error response:", errorText)
-        throw new Error(errorText || "Failed to get response")
-      }
-
-      if (!response.body) throw new Error("No response body")
-
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let assistantMessage = ""
-      const assistantId = Date.now().toString()
-      let messageAdded = false
-
-      while (true) {
-        const { done, value: chunk } = await reader.read()
-        if (done) break
-
-        const text = decoder.decode(chunk)
-        const lines = text.split("\n")
-
-        for (const line of lines) {
-          if (line.startsWith("0:")) {
-            const content = line.slice(2)
-            assistantMessage += content
-
-            if (!messageAdded) {
-              addMessage({
-                id: assistantId,
-                role: "assistant",
-                content: assistantMessage,
-              })
-              messageAdded = true
-            } else {
-              const allMessages = useChatStore.getState().messages
-              const idx = allMessages.findIndex((m) => m.id === assistantId)
-              if (idx !== -1) {
-                allMessages[idx].content = assistantMessage
-                useChatStore.getState().setMessages([...allMessages])
-              }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to send message"
-      setError(errorMessage)
-    } finally {
-      setIsLoading(false)
-    }
+    submit()
   }
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-6 sm:px-6">
       {error && (
         <div className="mb-3 flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-          <div className="flex-1">{error}</div>
-          <button
-            type="button"
-            onClick={clearError}
-            className="text-destructive hover:text-destructive/80"
-          >
-            ×
-          </button>
+          <div className="flex-1">{error.message}</div>
         </div>
       )}
 
@@ -205,7 +56,7 @@ export function ChatInput() {
             <button
               key={action.label}
               type="button"
-              onClick={() => handleQuickAction(action.label)}
+              onClick={() => setInput(action.label)}
               disabled={isLoading}
               className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/8 pl-3 pr-4 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-primary/15 hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -217,7 +68,8 @@ export function ChatInput() {
       </div>
 
       <form
-        onSubmit={handleSubmit}
+        ref={formRef}
+        onSubmit={handleFormSubmit}
         className="flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-2 shadow-lg backdrop-blur transition-all focus-within:border-primary/60 focus-within:shadow-primary/10 focus-within:shadow-xl"
       >
         <label className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
@@ -227,8 +79,8 @@ export function ChatInput() {
         </label>
 
         <textarea
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={1}
           placeholder="Message Hermes…"
@@ -237,10 +89,10 @@ export function ChatInput() {
 
         <button
           type="submit"
-          disabled={!value.trim() || isLoading}
+          disabled={!input.trim() || isLoading}
           className={cn(
             "flex size-9 shrink-0 items-center justify-center rounded-xl transition-colors",
-            value.trim() && !isLoading
+            input.trim() && !isLoading
               ? "bg-primary text-white shadow-md shadow-primary/30 hover:bg-primary/90"
               : "bg-muted text-muted-foreground",
           )}
@@ -250,7 +102,7 @@ export function ChatInput() {
         </button>
       </form>
       <p className="mt-2 text-center font-mono text-[11px] text-muted-foreground/60">
-        Hermes runs quietly in the background.
+        Press Enter to send · Shift+Enter for new line
       </p>
     </div>
   )
