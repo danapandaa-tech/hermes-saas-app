@@ -1,45 +1,14 @@
-import { streamText } from 'ai'
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { saveMessage } from '@/lib/messages'
+export const runtime = 'edge'
 
-function createProvider() {
-  return createOpenAICompatible({
-    name: 'openrouter',
-    baseURL: 'https://openrouter.ai/api/v1',
-    apiKey: process.env.OPENROUTER_API_KEY!,
-    headers: {
-      'HTTP-Referer': 'https://hermes-saas-app.vercel.app',
-      'X-Title': 'Hermes Operations Companion',
-    },
-  })
-}
-
-// Fallback chain: paid DeepSeek → free Gemma → free GPT-OSS → free Nemotron
-const MODEL_CHAIN = [
-  'deepseek/deepseek-chat',
-  'google/gemma-4-26b-a4b-it:free',
-  'openai/gpt-oss-20b:free',
-  'nvidia/nemotron-nano-9b-v2:free',
-]
+const EVE_AGENT_URL = process.env.EVE_AGENT_URL || 'https://atelier-agent-virid.vercel.app/api/ach'
 
 export async function POST(request: Request) {
-  if (!process.env.OPENROUTER_API_KEY) {
-    return new Response(
-      JSON.stringify({
-        error: 'AI service not configured. Add OPENROUTER_API_KEY to enable chat.',
-      }),
-      { status: 503, headers: { 'Content-Type': 'application/json' } }
-    )
-  }
+  try {
+    const body = await request.json()
+    const { messages } = body
 
-  const { messages } = await request.json()
-  const userMessage = messages[messages.length - 1]?.content || ''
-
-  if (userMessage) {
-    try { await saveMessage('user', userMessage) } catch {}
-  }
-
-  const systemPrompt = `You are Hermes, a calm and focused AI operations companion for neurodivergent solopreneurs and creatives.
+    // Prepare the payload for Eve agent
+    const systemPrompt = `You are Hermes, a calm and focused AI operations companion for neurodivergent solopreneurs and creatives.
 
 Your role:
 - Help manage projects, tasks, and workflows without overwhelming the user
@@ -58,28 +27,102 @@ Supported commands (handled client-side, just acknowledge):
 Tone: Calm, supportive, never urgent. Short paragraphs, bullet points, scannable.
 You are the calm in their chaos.`
 
-  const provider = createProvider()
-
-  // Try each model in the fallback chain
-  for (const model of MODEL_CHAIN) {
-    try {
-      const result = streamText({
-        model: provider(model),
-        messages,
-        system: systemPrompt,
-        max_tokens: 1000,
-      })
-
-      return result.toTextStreamResponse()
-    } catch (err) {
-      console.error(`Model ${model} failed:`, err)
-      continue
+    const payload = {
+      messages,
+      system: systemPrompt,
+      model: 'gpt-4o-mini',
+      max_tokens: 1000,
+      stream: true,
     }
-  }
 
-  // All models failed
-  return new Response(
-    JSON.stringify({ error: 'All AI models are unavailable. Please try again later.' }),
-    { status: 503, headers: { 'Content-Type': 'application/json' } }
-  )
+    // Create request headers, preserving any auth/custom headers from client
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+    })
+
+    // Forward any authorization or custom headers from the original request
+    const authHeader = request.headers.get('authorization')
+    if (authHeader) {
+      headers.set('authorization', authHeader)
+    }
+
+    // Make the request to Eve agent with explicit streaming support
+    const response = await fetch(EVE_AGENT_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+    })
+
+    // Check for error responses
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('[v0] Eve agent error:', response.status, errorText)
+
+      return new Response(
+        `data: ${JSON.stringify({
+          error: `Eve agent error: ${response.status}`,
+          details: errorText.slice(0, 200),
+        })}\n\n`,
+        {
+          status: 200, // Return 200 with error in stream so client can parse it
+          headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+          },
+        }
+      )
+    }
+
+    // Stream the response directly from Eve agent to client
+    // This ensures no buffering and preserves the stream integrity
+    const reader = response.body?.getReader()
+    if (!reader) {
+      throw new Error('No response body from Eve agent')
+    }
+
+    // Create a passthrough stream
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) {
+              controller.close()
+              break
+            }
+            controller.enqueue(value)
+          }
+        } catch (err) {
+          console.error('[v0] Stream error:', err)
+          controller.error(err)
+        }
+      },
+    })
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
+  } catch (error) {
+    console.error('[v0] Chat proxy error:', error)
+
+    // Return error in SSE format so client can parse it
+    return new Response(
+      `data: ${JSON.stringify({
+        error: 'Failed to connect to AI service',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      })}\n\n`,
+      {
+        status: 200, // Return 200 with error in stream
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+        },
+      }
+    )
+  }
 }
