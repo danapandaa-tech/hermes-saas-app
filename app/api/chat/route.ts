@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
     // 2. Execution: Stream the response directly from OpenRouter's gateway
     const result = await streamText({
-      model: openrouter('google/gemini-2.0-flash-exp:free'), 
+      model: openrouter('nvidia/nemotron-3-super-120b-a12b:free'), 
       messages,
       onFinish: async ({ text }) => {
         // 3. Persistence: Log the AI's response back to your database
@@ -44,8 +44,29 @@ export async function POST(req: Request) {
       },
     });
 
-    // 4. Delivery: Return the stream in a format compatible with Vercel AI SDK
-    return result.toDataStreamResponse();
+    // 4. Delivery: Stream text in the classic "0:" SSE format the frontend parses
+    // (AI SDK v7 dropped toDataStreamResponse; we emit the legacy format manually)
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const value of result.textStream) {
+            controller.enqueue(encoder.encode(`0:${value}\n`));
+          }
+          controller.close();
+        } catch (e) {
+          controller.error(e);
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
 
   } catch (error: any) {
     console.error('CRITICAL_GATEWAY_ERROR:', error);
