@@ -2,7 +2,7 @@ import { db } from '@/lib/db'
 import { messages } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
-const WORKSPACE_ID = 'lumen-rebrand' // Default workspace for demo
+const WORKSPACE_ID = 'default' // Default workspace
 
 export async function saveMessage(
   role: 'user' | 'assistant',

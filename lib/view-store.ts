@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 
-export type ViewType = 'chat' | 'research' | 'automations' | 'projects' | 'knowledge' | 'documents' | 'integrations' | 'settings'
+export type ViewType = 'chat' | 'research' | 'automations' | 'projects' | 'knowledge' | 'documents' | 'integrations' | 'settings' | 'mind'
 
 interface ViewStore {
   activeView: ViewType

@@ -7,7 +7,8 @@ import { useAuth } from '@/lib/use-auth'
 import { useTaskStore } from '@/lib/task-store'
 
 export function ProjectsView() {
-  const { userId } = useAuth()
+  const { userId: authUserId } = useAuth()
+  const userId = authUserId || 'demo-user'
   const projects = useProjectStore((state) => state.projects)
   const addProject = useProjectStore((state) => state.addProject)
   const updateProject = useProjectStore((state) => state.updateProject)
@@ -105,14 +106,17 @@ export function ProjectsView() {
             </div>
           ) : (
             activeProjects.map((project) => (
-              <button
+              <div
                 key={project.id}
                 onClick={() => selectProject(project.id)}
-                className={`w-full rounded-lg border p-3 text-left transition-colors ${
+                className={`w-full rounded-lg border p-3 text-left transition-colors cursor-pointer ${
                   selectedProjectId === project.id
                     ? 'border-primary bg-primary/10'
                     : 'border-border hover:bg-muted/50'
                 }`}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectProject(project.id) }}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
@@ -149,7 +153,7 @@ export function ProjectsView() {
                     </button>
                   </div>
                 </div>
-              </button>
+              </div>
             ))
           )}
         </div>

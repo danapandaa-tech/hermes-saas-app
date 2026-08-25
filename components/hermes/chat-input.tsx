@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { Paperclip, ArrowUp, Sparkles, ListChecks, FileText, Zap } from "lucide-react"
+import { Paperclip, ArrowUp, Sparkles, ListChecks, FileText, Zap, BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/lib/store"
 import { useProjectStore } from "@/lib/project-store"
 import { useTaskStore } from "@/lib/task-store"
 import { useMemoryStore } from "@/lib/memory-store"
 import { useAuth } from "@/lib/use-auth"
+import { useViewStore } from "@/lib/view-store"
 
 const quickActions = [
   { label: "Summarize project", icon: Sparkles },
@@ -32,7 +33,7 @@ export function ChatInput() {
   const tasks = useTaskStore((state) => state.tasks)
   const addTask = useTaskStore((state) => state.addTask)
 
-  const handleQuickAction = (action: string) => {
+  const handleQuickAction = (action: string, viewAction?: string) => {
     setValue(action)
   }
   
@@ -191,7 +192,7 @@ export function ChatInput() {
             <button
               key={action.label}
               type="button"
-              onClick={() => handleQuickAction(action.label)}
+              onClick={() => handleQuickAction(action.label, (action as any).action)}
               disabled={isLoading}
               className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/8 pl-3 pr-4 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-primary/15 hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             >

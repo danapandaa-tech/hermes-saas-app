@@ -1,41 +1,48 @@
-// Mock auth context - to be replaced with real Better Auth when BETTER_AUTH_SECRET is set
+import { headers } from 'next/headers'
+import { auth } from '@/lib/auth'
 
-export type User = {
+export type AuthUser = {
   id: string
   email: string
   name: string
-  avatar?: string
+  image?: string | null
+  tier: string
 }
 
-export type Session = {
-  user: User
-  expires: Date
+/**
+ * Server-side helper — call from Server Components, API routes, or Server Actions.
+ * Returns `null` when no valid session exists.
+ */
+export async function getServerAuth(): Promise<{ user: AuthUser; session: object } | null> {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
+    if (!session) return null
+
+    return {
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        image: session.user.image,
+        tier: (session.user as any).tier ?? 'free',
+      },
+      session: session.session,
+    }
+  } catch {
+    return null
+  }
 }
 
-// Placeholder user for development - replace with real auth later
-export const MOCK_USER: User = {
-  id: 'user_placeholder',
-  email: 'you@example.com',
-  name: 'Ada Maro',
-  avatar: 'AM',
-}
-
-export const MOCK_SESSION: Session = {
-  user: MOCK_USER,
-  expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-}
-
-// Get current user - placeholder until real auth is implemented
-export function getCurrentUser(): User {
-  return MOCK_USER
-}
-
-// Get current session - placeholder until real auth is implemented
-export function getCurrentSession(): Session {
-  return MOCK_SESSION
-}
-
-// Get current user ID for database queries
-export function getCurrentUserId(): string {
-  return MOCK_USER.id
+/**
+ * Server-side helper that redirects to /auth when unauthenticated.
+ * Use in pages that require a logged-in user.
+ */
+export async function requireAuth(): Promise<{ user: AuthUser; session: object }> {
+  const result = await getServerAuth()
+  if (!result) {
+    throw new Error('UNAUTHORIZED')
+  }
+  return result
 }

@@ -8,6 +8,7 @@ import { ChatInput } from "@/components/hermes/chat-input"
 import { ContextPanel } from "@/components/hermes/context-panel"
 import { ThreadAnimation } from "@/components/hermes/thread-animation"
 import { useTheme } from "@/lib/use-theme"
+import { useAuth } from "@/lib/use-auth"
 import { useViewStore } from "@/lib/view-store"
 import { ResearchView } from "@/components/hermes/views/research-view"
 import { AutomationsView } from "@/components/hermes/views/automations-view"
@@ -16,13 +17,29 @@ import { KnowledgeView } from "@/components/hermes/views/knowledge-view"
 import { DocumentsView } from "@/components/hermes/views/documents-view"
 import { IntegrationsView } from "@/components/hermes/views/integrations-view"
 import { SettingsView } from "@/components/hermes/views/settings-view"
+import { MindView } from "@/components/hermes/views/mind-view"
+import { Onboarding } from "@/components/hermes/onboarding"
+import { GlobalSearch } from "@/components/hermes/global-search"
+import { NotificationBell } from "@/components/hermes/notification-bell"
 
 export default function Page() {
   const [threadActive, setThreadActive] = useState(false)
   const [contextOpen, setContextOpen] = useState(true)
   const workflowRef = useRef<HTMLDivElement>(null)
   const { theme, toggle } = useTheme()
+  const { isLoading: authLoading } = useAuth()
   const activeView = useViewStore((state) => state.activeView)
+
+  if (authLoading) {
+    return (
+      <div className="flex h-dvh w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-xs text-muted-foreground">Loading workspace…</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleThreadDemo = () => {
     setThreadActive(true)
@@ -45,6 +62,8 @@ export default function Page() {
         return <IntegrationsView />
       case "settings":
         return <SettingsView />
+      case "mind":
+        return <MindView />
       case "chat":
       default:
         return (
@@ -67,6 +86,8 @@ export default function Page() {
         />
       )}
       <NavSidebar />
+      <Onboarding />
+      <GlobalSearch />
 
       {/* Main workspace */}
       <main className="hermes-aurora flex min-w-0 flex-1 flex-col">
@@ -75,7 +96,7 @@ export default function Page() {
             <p className="truncate text-sm font-medium text-foreground capitalize">{activeView}</p>
             {isChatView && (
               <p className="hidden truncate font-mono text-[11px] text-muted-foreground/60 sm:block">
-                Lumen Rebrand · Solo Studio
+                Your AI workspace
               </p>
             )}
           </div>
@@ -90,6 +111,7 @@ export default function Page() {
                 <span>✨ Demo</span>
               </button>
             )}
+            <NotificationBell />
             {/* Discrete day/night toggle */}
             <button
               type="button"

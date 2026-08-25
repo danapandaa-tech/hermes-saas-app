@@ -1,6 +1,7 @@
 import {
   boolean,
   integer,
+  jsonb,
   pgTable,
   serial,
   text,
@@ -158,3 +159,22 @@ export const usageCounters = pgTable(
     unique('usage_counters_userId_month_key').on(table.userId, table.month),
   ],
 )
+
+
+// ─── Cognitive State (ND Cognitive OS integration) ──────────────────────────
+// Stores the full cognitive document per user: state machine, profile,
+// emotional/sensory logs, discoveries, and SPARK results as JSONB.
+export const cognitiveState = pgTable('cognitive_state', {
+  id: text('id').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  cognitiveState: jsonb('cognitiveState').notNull().default({}),
+  profile: jsonb('profile').notNull().default({}),
+  emotionalLog: jsonb('emotionalLog').notNull().default([]),
+  sensoryLog: jsonb('sensoryLog').notNull().default([]),
+  discoveries: jsonb('discoveries').notNull().default([]),
+  sparkResults: jsonb('sparkResults'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+})

@@ -1,8 +1,12 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { useChatStore } from "@/lib/store"
+import { useAuth } from "@/lib/use-auth"
+import { useMemoryStore } from "@/lib/memory-store"
+import { useProjectStore } from "@/lib/project-store"
+import { useViewStore } from "@/lib/view-store"
 
 function HermesMark({ className }: { className?: string }) {
   return (
@@ -15,8 +19,6 @@ function HermesMark({ className }: { className?: string }) {
     </svg>
   )
 }
-
-
 
 export function ChatStream() {
   const messages = useChatStore((state: any) => state.messages)
@@ -33,14 +35,12 @@ export function ChatStream() {
         <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
           <HermesMark className="size-6 text-primary" />
         </div>
-        {/* Fraunces only here: the session title is the one display moment */}
         <h1 className="font-heading text-balance text-2xl font-medium tracking-tight text-foreground">
-          Lumen Rebrand
+          Hermes
         </h1>
         <p className="max-w-sm text-pretty text-sm leading-relaxed text-muted-foreground">
-          A calm space to think. Hermes carries your context, tasks, and workflows so you don&apos;t have to.
+          Your AI workspace for research, automation, and cognitive flow.
         </p>
-        {/* Hairline rule beneath the header block */}
         <div className="mt-2 h-px w-16 bg-primary/30" />
       </div>
 
@@ -69,16 +69,19 @@ export function ChatStream() {
 }
 
 function MessageBubble({ message }: { message: { id: string; role: string; content: string } }) {
-  const { useMemoryStore } = require("@/lib/memory-store")
-  const { useProjectStore } = require("@/lib/project-store")
   const addMemory = useMemoryStore((state: any) => state.addMemory)
   const selectedProjectId = useProjectStore((state: any) => state.selectedProjectId)
+  const setActiveView = useViewStore((state: any) => state.setActiveView)
+  const { userId } = useAuth()
+  const [saved, setSaved] = useState(false)
   
   const isUser = message.role === "user"
   
   const handleSaveToMemory = () => {
-    const { getCurrentUserId } = require("@/lib/auth-context")
-    const userId = getCurrentUserId()
+    if (!userId) {
+      console.warn('Cannot save memory: user not authenticated')
+      return
+    }
     const memory = {
       id: `mem_${Date.now()}`,
       userId,
@@ -90,7 +93,14 @@ function MessageBubble({ message }: { message: { id: string; role: string; conte
       updatedAt: new Date(),
     }
     addMemory(memory)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
   }
+
+  const handleViewKnowledge = () => {
+    setActiveView('knowledge')
+  }
+
   return (
     <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
       <div
@@ -114,13 +124,24 @@ function MessageBubble({ message }: { message: { id: string; role: string; conte
           {message.content}
         </div>
         {!isUser && (
-          <button
-            onClick={handleSaveToMemory}
-            className="text-xs text-muted-foreground opacity-0 transition-opacity group-hover/msg:opacity-100 hover:text-foreground"
-            title="Save this message to memory"
-          >
-            Save to memory
-          </button>
+          <div className="flex items-center gap-2 text-xs">
+            <button
+              onClick={handleSaveToMemory}
+              disabled={saved}
+              className="text-muted-foreground opacity-60 transition-opacity group-hover/msg:opacity-100 hover:text-primary disabled:opacity-100 disabled:text-green-600"
+              title="Save to Knowledge Base"
+            >
+              {saved ? "✓ Saved!" : "📌 Save"}
+            </button>
+            <span className="text-muted-foreground/40">•</span>
+            <button
+              onClick={handleViewKnowledge}
+              className="text-muted-foreground opacity-60 transition-opacity group-hover/msg:opacity-100 hover:text-primary"
+              title="View Knowledge Base"
+            >
+              Knowledge →
+            </button>
+          </div>
         )}
       </div>
     </div>

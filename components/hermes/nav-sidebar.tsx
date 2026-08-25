@@ -1,23 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import {
-  MessageSquare,
-  FolderKanban,
-  BookOpen,
-  Workflow,
-  Telescope,
-  FileText,
-  Plug,
-  Settings,
-  ChevronsUpDown,
-  Check,
-  Menu,
-  X,
-} from "lucide-react"
+import { MessageSquare, FolderKanban, BookOpen, Workflow, Telescope, FileText, Plug, Settings, ChevronsUpDown, Check, Menu, X, Brain, ExternalLink } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useViewStore, type ViewType } from "@/lib/view-store"
 import { useAuth } from "@/lib/use-auth"
+import { signOut } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
 
 const navItems: Array<{ label: string; icon: React.ComponentType<{ className?: string }>; view: ViewType }> = [
   { label: "Chat", icon: MessageSquare, view: "chat" },
@@ -27,13 +16,15 @@ const navItems: Array<{ label: string; icon: React.ComponentType<{ className?: s
   { label: "Research", icon: Telescope, view: "research" },
   { label: "Documents", icon: FileText, view: "documents" },
   { label: "Integrations", icon: Plug, view: "integrations" },
+  { label: "Mind", icon: Brain, view: "mind" },
   { label: "Settings", icon: Settings, view: "settings" },
 ]
 
 const workspaces = ["Solo Studio", "Client Work", "Personal"]
 
 export function NavSidebar() {
-  const { userId } = useAuth()
+  const { user } = useAuth()
+  const router = useRouter()
   const activeView = useViewStore((state) => state.activeView)
   const setActiveView = useViewStore((state) => state.setActiveView)
   const sidebarOpen = useViewStore((state) => state.sidebarOpen)
@@ -41,8 +32,13 @@ export function NavSidebar() {
   const [switcherOpen, setSwitcherOpen] = useState(false)
   const [workspace, setWorkspace] = useState(workspaces[0])
   
-  // Get user display info
-  const userInitials = userId.slice(-2).toUpperCase()
+  const displayName = user?.name || user?.email || 'Guest'
+  const userInitials = (user?.name || user?.email || 'G')
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 
   return (
     <>
@@ -107,6 +103,7 @@ export function NavSidebar() {
               onClick={() => setActiveView(item.view)}
             />
           ))}
+
         </nav>
 
         {/* Workspace switcher + avatar */}
@@ -138,10 +135,20 @@ export function NavSidebar() {
               {userInitials}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-sidebar-foreground">{userId}</p>
+              <p className="truncate text-sm font-medium text-sidebar-foreground">{displayName}</p>
               <p className="truncate text-xs text-muted-foreground">{workspace}</p>
             </div>
             <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              await signOut()
+              router.push('/auth')
+            }}
+            className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent/50 hover:text-foreground"
+          >
+            Sign out
           </button>
         </div>
       </aside>
