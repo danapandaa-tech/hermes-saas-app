@@ -3,9 +3,11 @@ import type { NextRequest } from 'next/server'
 
 // Better Auth sets this cookie name by default
 const SESSION_COOKIE = 'better-auth.session_token'
+const DEMO_COOKIE = 'hermes-demo-mode'
 
 export async function middleware(request: NextRequest) {
   const hasSession = request.cookies.has(SESSION_COOKIE)
+  const hasDemoMode = request.cookies.has(DEMO_COOKIE)
 
   // Public paths that don't need auth
   const publicPaths = ['/auth', '/api/auth']
@@ -23,7 +25,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect to login if no session cookie
-  if (!hasSession) {
+  if (!hasSession && !hasDemoMode) {
     return NextResponse.redirect(new URL('/auth', request.url))
   }
 

@@ -1,6 +1,6 @@
 {
-  "name": "my-project",
-  "version": "0.1.0",
+  "name": "hermes-saas-app",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -50,5 +50,6 @@
     "overrides": {
       "hono": "4.12.25"
     }
-  }
+  },
+  "description": "Cognitive AI workspace with neurodivergent-friendly features"
 }

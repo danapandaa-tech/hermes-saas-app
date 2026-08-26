@@ -13,6 +13,14 @@ export default function AuthPage() {
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [demoMode, setDemoMode] = useState(false)
+
+  const handleDemoMode = () => {
+    setDemoMode(true)
+    // Store demo mode flag and redirect
+    document.cookie = 'hermes-demo-mode=true; path=/; max-age=86400'
+    router.push('/')
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
